@@ -257,7 +257,7 @@ a{color:inherit}
 .delta.down{color:var(--mint)} .delta.up{color:var(--coral)}
 .hero .sum .delta.down{color:#8FE3BC}.hero .sum .delta.up{color:#FFB59F}
 .hero .sum .sum-label{white-space:nowrap}
-.hero .updated{margin-top:12px;font-size:12px;color:var(--ink-soft)}
+.hero .updated{margin-top:12px;font-size:12.5px;color:var(--ink-soft);font-weight:600;text-align:right;}.hero .updated .update-date{display:inline-block;margin-left:3px;padding:2px 10px;border-radius:999px;background:var(--navy-pale);color:var(--navy);font-weight:900;font-size:12.5px;}@media(max-width:640px){.hero .updated{text-align:center}}
 
 /* ---------- 홈: 전국 카드 ---------- */
 .natgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
@@ -268,7 +268,7 @@ a{color:inherit}
 .natcard .big{font-size:32px;font-weight:900;letter-spacing:-.02em;color:var(--ink-strong)}
 .natcard .big small{font-size:14px;font-weight:600;color:var(--ink-soft);margin-left:4px}
 .natcard .chg{font-size:16px;font-weight:800;margin-top:2px}
-.minichart{margin-top:14px}
+.minichart{margin-top:14px}.top5grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px}@media(max-width:760px){.top5grid{grid-template-columns:1fr}}.top5card{padding:20px 18px 14px}.top5card .section-title{margin-bottom:10px}.top5card .rankwrap{padding:0}.top5card .rankrow{grid-template-columns:36px 1fr 88px}.top5card .rankrow .barcell{display:none}.top5card .rankrow .val{text-align:right}@media(max-width:420px){.top5card .rankrow{grid-template-columns:30px 1fr 76px}}
 .minichart svg{width:100%;height:auto;display:block}
 .minichart-pad{height:6px}
 
@@ -726,11 +726,11 @@ section.timeline{margin-top:40px}
     </div>
 
     <div class="sum">
-      <span class="sum-label">전국 대학 탄소배출량, 전년 대비</span>
+      <span class="sum-label">전국 대학 탄소배출량 전년 대비</span>
       <span class="delta down" id="heroDelta">−3.1%</span>
       <span>감소</span>
     </div>
-    <div class="updated" id="heroUpdated">데이터 출처: 온실가스종합정보센터·대학알리미 (샘플) · 최근 업데이트 2026.07</div>
+    <div class="updated" id="heroUpdated">데이터 출처: 온실가스종합정보센터·데이터팀 (샘플) · 최근 업데이트 <b class="update-date">2026.07</b></div>
   </section>
 
   <div class="natgrid">
@@ -759,6 +759,43 @@ section.timeline{margin-top:40px}
       <div class="minichart-pad"></div>
     </div>
   </div>
+  <div class="top5grid">
+    <div class="card top5card">
+      <h3 class="section-title">🏭 탄소배출량 TOP5 대학</h3>
+      <div class="rankwrap" id="top5EmitList"></div>
+    </div>
+    <div class="card top5card">
+      <h3 class="section-title">🌱 배출량 감소율 TOP5 대학</h3>
+      <div class="rankwrap" id="top5ReduceList"></div>
+    </div>
+  </div>
+
+  <section class="notice-sec">
+    <div class="head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 class="section-title" style="margin-bottom:0">📌 공지사항</h3>
+      <button class="ghost-btn" onclick="go('notice')">전체보기</button>
+    </div>
+    <div class="notice-row">
+      <div class="card notice-card" onclick="go('notice')">
+        <span class="notice-tag n3">행사</span>
+        <div class="notice-title">[세미나] 기후위기 시대, 우리 대학은 살아남을 수 있을까?<span class="nb-new">NEW</span></div>
+        <div class="notice-desc">누구나 참여할 수 있는 3주간의 온라인 세미나를 개최합니다. 3회차 모두 참여하신 분께는 수료증을 수여합니다. (08.13 ~ 08.27, ZOOM)</div>
+        <div class="notice-date">2026.07.28</div>
+      </div>
+      <div class="card notice-card" onclick="go('notice')">
+        <span class="notice-tag n1">공지</span>
+        <div class="notice-title">2026 하반기 정기회의 일정 안내</div>
+        <div class="notice-desc">매주 화요일 19:00–20:30, 온라인으로 진행됩니다. 참여 링크는 협의체 채널을 확인해 주세요.</div>
+        <div class="notice-date">2026.07.10</div>
+      </div>
+      <div class="card notice-card" onclick="go('notice')">
+        <span class="notice-tag n2">캠페인</span>
+        <div class="notice-title">⚡ 우리 학교 탄소 순위 공유 챌린지</div>
+        <div class="notice-desc">우리 학교 상세 페이지의 공유 버튼으로 전국 순위를 SNS에 공유하고 감축 응원에 동참해 보세요.</div>
+        <div class="notice-date">2026.07 ~ 08</div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <!-- ================= 협의체 소개 ================= -->
@@ -1911,9 +1948,9 @@ function renderHome(){
   document.getElementById('natEnergyVal').innerHTML=fmt(Math.round(e[LAST]))+'<small>TJ</small>';
   document.getElementById('natCarbonChg').innerHTML='전년 대비 '+deltaHTML(cChg);
   document.getElementById('natEnergyChg').innerHTML='전년 대비 '+deltaHTML(eChg);
-  drawMini('natCarbonChart',c); drawMini('natEnergyChart',e);
+  drawMini('natCarbonChart',c); drawMini('natEnergyChart',e);renderHomeTop5();
 }
-function drawMini(id,arr){
+function renderHomeTop5(){const emitRows=[...SCHOOLS].map(s=>({s,v:s.c[LAST]})).sort((a,b)=>b.v-a.v).slice(0,5);document.getElementById('top5EmitList').innerHTML=emitRows.map((r,i)=>`<div class="rankrow" onclick="openDetail('${r.s.n}')"><div class="num">${i+1}위</div><div class="name" title="${r.s.n}">${r.s.n}</div><div class="val">${fmt(Math.round(r.v))} <small style="font-weight:600">tCO₂e</small></div></div>`).join('');const reduceRows=[...SCHOOLS].map(s=>({s,v:chg(s.c)})).sort((a,b)=>a.v-b.v).slice(0,5);document.getElementById('top5ReduceList').innerHTML=reduceRows.map((r,i)=>`<div class="rankrow" onclick="openDetail('${r.s.n}')"><div class="num">${i+1}위</div><div class="name" title="${r.s.n}">${r.s.n}</div><div class="val">${deltaHTML(r.v)}</div></div>`).join('');}function drawMini(id,arr){
   const el=document.getElementById(id);
   const W=300,H=150,P={l:60,r:8,t:8,b:22};
   const dataMin=Math.min(...arr), dataMax=Math.max(...arr);
