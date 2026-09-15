@@ -707,6 +707,17 @@ section.timeline{margin-top:36px}
 .mappanel .mp-rank{display:inline-block;background:var(--accent);color:#fff;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:900;margin:9px 0 10px}
 .mappanel .mp-stat{font-size:13.5px;color:var(--ink-soft);line-height:1.85}
 .mappanel .mp-stat b{color:var(--ink-strong)}
+.mappanel .mp-hint{margin-top:10px;font-size:12.5px;line-height:1.6}
+/* 지도 정보 창 — 우리 학교와 비교 */
+.mp-compare{border-top:1px solid var(--line);padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.mp-cmp-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.mp-cmp-head b{font-size:15px;font-weight:900;color:var(--ink-strong)}
+.mp-cmp-head span{font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+.mp-cmp-keys{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--ink)}
+.mp-cmp-keys span{display:flex;align-items:center;gap:8px}
+.mp-cmp-keys i{width:16px;height:4px;border-radius:2px;flex:0 0 auto}
+.mp-compare .cmp-chart{padding:12px}
+.mp-cmp-src{font-size:12px;color:var(--ink-faint)}
 
 /* ============================================================
    플랫폼 소개 (kuce-platform-intro.html 이식 · 신규 클래스는 모두 pf- 접두사)
@@ -2667,6 +2678,8 @@ const state = {
   detailTab: 'carbon',
   mapCam: null,
   mapSel: null,
+  mapCompare: false,        /* 지도 정보 창의 '우리 학교와 비교' 펼침 여부 */
+  mapCmpMetric: 'total',
   my: null
 };
 
@@ -3388,16 +3401,21 @@ function renderSelection() {
   drawCmpBar(document.getElementById('cmpBar'));
 }
 
-function drawCmpLine(host) {
-  const unit = unitOf(state.tab, state.metric);
-  const items = state.selected.map(id => byId(id));
+/* opt(선택): { ids, tab, metric, colorOf, fs(글자 배율), W·H(그림 크기), label }
+   — 지도 정보 창의 '우리 학교와 비교'도 같은 차트를 씁니다. 생략하면 학교비교 화면의 선택 상태를 따릅니다. */
+function drawCmpLine(host, opt = {}) {
+  const tab = opt.tab || state.tab, metric = opt.metric || state.metric, fs = opt.fs || 1;
+  const f = n => +(n * fs).toFixed(2);
+  const colorOf = opt.colorOf || (u => selColor(u.id));
+  const unit = unitOf(tab, metric);
+  const items = (opt.ids || state.selected).map(id => byId(id));
   const values = [];
   items.forEach(u => YEARS.forEach((_, yi) => {
-    const v = metricVal(u, state.tab, state.metric, yi);
+    const v = metricVal(u, tab, metric, yi);
     if (v != null) values.push(v);
   }));
   if (!values.length) { host.innerHTML = '<div class="cmp-empty">표시할 값이 없습니다.</div>'; return; }
-  const W = 430, H = 250, P = { l: 58, r: 14, t: 14, b: 30 };
+  const W = opt.W || 430, H = opt.H || 250, P = { l: Math.round(44 + 14 * fs), r: 14, t: 14, b: Math.round(20 + 10 * fs) };
   const lo = Math.min(...values), hi = Math.max(...values);
   const pad = (hi - lo) * .18 || hi * .08;
   const min = Math.max(0, lo - pad), max = hi + pad;
@@ -3408,55 +3426,58 @@ function drawCmpLine(host) {
   for (let g = 0; g <= 3; g++) {
     const gv = min + (max - min) * g / 3, gy = y(gv);
     grid += '<line x1="' + P.l + '" y1="' + gy.toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + gy.toFixed(1) + '" stroke="#E3E8EE"/>';
-    ylab += '<text x="' + (P.l - 7) + '" y="' + (gy + 3.5).toFixed(1) + '" text-anchor="end" font-size="9" fill="#8A95A3">' + valText(gv, state.metric) + '</text>';
+    ylab += '<text x="' + (P.l - 7) + '" y="' + (gy + f(3.5)).toFixed(1) + '" text-anchor="end" font-size="' + f(9) + '" fill="#8A95A3">' + valText(gv, metric) + '</text>';
   }
   YEARS.forEach((yr, i) => {
-    xlab += '<text x="' + x(i).toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="10" fill="#5A6675">' + yr + '</text>';
+    xlab += '<text x="' + x(i).toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="' + f(10) + '" fill="#5A6675">' + yr + '</text>';
     /* 연도 전체를 덮는 투명 밴드 — 그 해의 모든 선택 학교 값을 한 툴팁에 모아서 보여 줍니다 */
     const rows = items.map(u => {
-      const v = metricVal(u, state.tab, state.metric, i);
+      const v = metricVal(u, tab, metric, i);
       return [
-        '<span class="sw" style="background:' + selColor(u.id) + '"></span>' + esc(u.name),
-        v == null ? NODATA : valText(v, state.metric) + ' ' + unit
+        '<span class="sw" style="background:' + colorOf(u) + '"></span>' + esc(u.name),
+        v == null ? NODATA : valText(v, metric) + ' ' + unit
       ];
     });
     const bw = (W - P.l - P.r) / YEARS.length;
     bands += '<rect x="' + (x(i) - bw / 2).toFixed(1) + '" y="' + P.t + '" width="' + bw.toFixed(1) + '" height="' +
-      (H - P.t - P.b) + '" fill="transparent" data-tip="' + attr(tipBody(yr + '년 비교', rows, sourceLine(state.tab))) + '"/>';
+      (H - P.t - P.b) + '" fill="transparent" data-tip="' + attr(tipBody(yr + '년 비교', rows, sourceLine(tab))) + '"/>';
   });
   items.forEach(u => {
-    const color = selColor(u.id);
+    const color = colorOf(u);
     const pts = YEARS.map((_, i) => {
-      const v = metricVal(u, state.tab, state.metric, i);
+      const v = metricVal(u, tab, metric, i);
       return v == null ? null : x(i).toFixed(1) + ',' + y(v).toFixed(1);
     }).filter(Boolean);
     lines += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + color +
       '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>';
     YEARS.forEach((yr, i) => {
-      const v = metricVal(u, state.tab, state.metric, i);
+      const v = metricVal(u, tab, metric, i);
       if (v == null) return;
-      const prev = i > 0 ? metricVal(u, state.tab, state.metric, i - 1) : null;
+      const prev = i > 0 ? metricVal(u, tab, metric, i - 1) : null;
       const rate = prev ? (v - prev) / prev * 100 : null;
       const tip = tipBody(u.name + ' · ' + yr + '년', [
-        ['값', valText(v, state.metric) + ' ' + unit],
+        ['값', valText(v, metric) + ' ' + unit],
         ['전년 대비', rate == null ? '—' : deltaText(rate)]
-      ], sourceLine(state.tab));
+      ], sourceLine(tab));
       dots += '<circle cx="' + x(i).toFixed(1) + '" cy="' + y(v).toFixed(1) + '" r="' + (i === LAST ? 5 : 3.6) +
         '" fill="' + color + '" stroke="#fff" stroke-width="1.8" tabindex="0" data-tip="' + attr(tip) + '"/>';
     });
   });
-  host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="선택한 학교의 연도별 추이">' +
+  host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + attr((opt.label || '선택한 학교의') + ' 연도별 추이') + '">' +
     grid + ylab + lines + dots + bands + xlab + '</svg>';
 }
 
-function drawCmpBar(host) {
-  const unit = unitOf(state.tab, state.metric);
-  const items = state.selected.map(id => byId(id))
-    .map(u => ({ u, v: metricVal(u, state.tab, state.metric) }))
+function drawCmpBar(host, opt = {}) {
+  const tab = opt.tab || state.tab, metric = opt.metric || state.metric, fs = opt.fs || 1;
+  const f = n => +(n * fs).toFixed(2);
+  const colorOf = opt.colorOf || (u => selColor(u.id));
+  const unit = unitOf(tab, metric);
+  const items = (opt.ids || state.selected).map(id => byId(id))
+    .map(u => ({ u, v: metricVal(u, tab, metric) }))
     .filter(r => r.v != null)
     .sort((a, b) => b.v - a.v);
   if (!items.length) { host.innerHTML = '<div class="cmp-empty">표시할 값이 없습니다.</div>'; return; }
-  const W = 430, H = 250, P = { l: 58, r: 14, t: 22, b: 44 };
+  const W = opt.W || 430, H = opt.H || 250, P = { l: Math.round(44 + 14 * fs), r: 14, t: Math.round(12 + 10 * fs), b: Math.round(28 + 16 * fs) };
   const max = Math.max(...items.map(r => r.v)) * 1.12;
   const slot = (W - P.l - P.r) / items.length;
   const bw = Math.min(46, slot * .6);
@@ -3465,25 +3486,25 @@ function drawCmpBar(host) {
   for (let g = 0; g <= 3; g++) {
     const gv = max * g / 3, gy = y(gv);
     grid += '<line x1="' + P.l + '" y1="' + gy.toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + gy.toFixed(1) + '" stroke="#E3E8EE"/>';
-    ylab += '<text x="' + (P.l - 7) + '" y="' + (gy + 3.5).toFixed(1) + '" text-anchor="end" font-size="9" fill="#8A95A3">' + valText(gv, state.metric) + '</text>';
+    ylab += '<text x="' + (P.l - 7) + '" y="' + (gy + f(3.5)).toFixed(1) + '" text-anchor="end" font-size="' + f(9) + '" fill="#8A95A3">' + valText(gv, metric) + '</text>';
   }
   items.forEach((r, i) => {
     const cx = P.l + slot * (i + .5);
     const by = y(r.v);
-    const color = selColor(r.u.id);
+    const color = colorOf(r.u);
     const tip = tipBody(r.u.name + ' · ' + YEARS[LAST] + '년', [
-      ['값', valText(r.v, state.metric) + ' ' + unit],
-      ['전년 대비', deltaText(chg(seriesOf(r.u, state.tab)))]
-    ], sourceLine(state.tab));
+      ['값', valText(r.v, metric) + ' ' + unit],
+      ['전년 대비', deltaText(chg(seriesOf(r.u, tab)))]
+    ], sourceLine(tab));
     bars += '<rect x="' + (cx - bw / 2).toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + bw.toFixed(1) +
       '" height="' + Math.max(1, (H - P.b) - by).toFixed(1) + '" rx="5" fill="' + color +
       '" tabindex="0" data-tip="' + attr(tip) + '"/>';
-    bars += '<text x="' + cx.toFixed(1) + '" y="' + (by - 6).toFixed(1) + '" text-anchor="middle" font-size="9.5" font-weight="800" fill="#16202C">' +
-      valText(r.v, state.metric) + '</text>';
+    bars += '<text x="' + cx.toFixed(1) + '" y="' + (by - f(6)).toFixed(1) + '" text-anchor="middle" font-size="' + f(9.5) + '" font-weight="800" fill="#16202C">' +
+      valText(r.v, metric) + '</text>';
     const short = r.u.name.length > 7 ? r.u.name.slice(0, 6) + '…' : r.u.name;
-    xlab += '<text x="' + cx.toFixed(1) + '" y="' + (H - P.b + 16) + '" text-anchor="middle" font-size="9.5" fill="#5A6675">' + esc(short) + '</text>';
+    xlab += '<text x="' + cx.toFixed(1) + '" y="' + (H - P.b + f(16)) + '" text-anchor="middle" font-size="' + f(9.5) + '" fill="#5A6675">' + esc(short) + '</text>';
   });
-  host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="선택한 학교의 최신 연도 비교">' +
+  host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + attr((opt.label || '선택한 학교의') + ' 최신 연도 비교') + '">' +
     grid + ylab + bars + xlab + '</svg>';
 }
 
@@ -4362,6 +4383,11 @@ function renderMapPanel() {
     return;
   }
   const r = rankOf(u, 'carbon');
+  const mine = byId(state.my);
+  const isMine = !!mine && mine.id === u.id;
+  /* 우리 학교를 정해 두고 다른 학교를 고르면 '우리 학교와 비교' 버튼이 나타납니다 */
+  const canCompare = !!mine && !isMine && mine.status === 'active';
+  const open = canCompare && state.mapCompare;
   p.innerHTML = '<div class="mp-in">' +
     '<div class="mp-name">' + esc(u.name) + '</div>' +
     '<div class="mp-meta">' + esc(u.region) + ' · ' + esc(schemeName(u.scheme)) + '</div>' +
@@ -4371,9 +4397,61 @@ function renderMapPanel() {
     '1인당 배출량 <b>' + fmt1(u.carbon[LAST] / u.members * 1000) + ' kgCO₂e/명</b></div>' +
     '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">' +
     '<button class="btn btn-primary btn-sm" type="button" onclick="openDetail(\'' + u.id + '\')">상세 페이지 보기</button>' +
-    '<button class="btn btn-ghost btn-sm" type="button" onclick="setMySchool(\'' + u.id + '\')">우리 학교로 설정</button>' +
+    (canCompare ? '<button class="btn btn-secondary btn-sm" type="button" id="mapCmpToggle" aria-expanded="' + open +
+      '" aria-controls="mapCompare" onclick="toggleMapCompare()">' + (open ? '비교 닫기' : '🏫 우리 학교(' + esc(mapLabel(mine)) + ')와 비교') + '</button>' : '') +
+    '<button class="btn btn-ghost btn-sm" type="button" onclick="setMySchool(\'' + u.id + '\')">' + (isMine ? '우리 학교로 설정됨' : '우리 학교로 설정') + '</button>' +
     '<button class="btn btn-ghost btn-sm" type="button" onclick="focusSchoolOnMap(\'' + u.id + '\')">지도에서 위치 보기</button>' +
-    '</div></div>';
+    '</div>' +
+    (mine ? '' : '<div class="muted mp-hint">우리 학교로 설정해 두면 다른 학교를 눌렀을 때 바로 비교할 수 있어요.</div>') +
+    '</div>' +
+    (open ? mapCompareHTML(mine, u) : '');
+  if (open) drawMapCompare(mine, u);
+}
+/* ---------- 지도 정보 창: 우리 학교와 비교 ---------- */
+const MAP_CMP_COLORS = { mine: '#B45309', other: '#1D4ED8' };   /* 우리 학교 황갈 · 비교 학교 파랑 — 색각 이상에서도 구분됩니다 */
+function mapCompareHTML(mine, u) {
+  const m = state.mapCmpMetric;
+  const unit = unitOf('carbon', m);
+  const label = metricDefs('carbon').find(d => d[0] === m)[1];
+  const chips = metricDefs('carbon').map(([k, name]) =>
+    '<button type="button" class="chip' + (k === m ? ' on' : '') + '" data-k="' + k + '" aria-pressed="' + (k === m) +
+    '" onclick="setMapCmpMetric(\'' + k + '\')">' + name + '</button>').join('');
+  return '<div class="mp-compare" id="mapCompare">' +
+    '<div class="mp-cmp-head"><b>우리 학교와 비교</b><span>탄소배출량 · ' + esc(label) + '</span></div>' +
+    '<div class="mp-cmp-keys">' +
+    '<span><i style="background:' + MAP_CMP_COLORS.mine + '"></i>우리 학교 · ' + esc(mine.name) + '</span>' +
+    '<span><i style="background:' + MAP_CMP_COLORS.other + '"></i>' + esc(u.name) + '</span></div>' +
+    '<div class="chips" role="group" aria-label="비교 지표">' + chips + '</div>' +
+    '<div class="cmp-chart"><h5>연도별 추이<span>' + esc(unit) + '</span></h5><div id="mapCmpLine"></div></div>' +
+    '<div class="cmp-chart"><h5>' + YEARS[LAST] + '년 비교<span>' + esc(unit) + '</span></h5><div id="mapCmpBar"></div></div>' +
+    '<div class="mp-cmp-src">출처: ' + esc(sourceLine('carbon')) + '</div>' +
+    '</div>';
+}
+function drawMapCompare(mine, u) {
+  const line = document.getElementById('mapCmpLine'), bar = document.getElementById('mapCmpBar');
+  /* 그림 폭을 실제 칸 폭에 맞춰 1단위 = 1px로 그립니다 → 휴대폰·태블릿에서도 차트 글자가 12px 안팎으로 일정 */
+  const W = Math.max(260, Math.round(line.clientWidth || 360));
+  const opt = {
+    ids: [mine.id, u.id], tab: 'carbon', metric: state.mapCmpMetric, W, H: 220, fs: 1.33,
+    colorOf: x => x.id === mine.id ? MAP_CMP_COLORS.mine : MAP_CMP_COLORS.other,
+    label: '우리 학교와 ' + u.name + '의'
+  };
+  drawCmpLine(line, opt);
+  drawCmpBar(bar, opt);
+}
+function toggleMapCompare() {
+  state.mapCompare = !state.mapCompare;
+  renderMapPanel();
+  const btn = document.getElementById('mapCmpToggle');
+  if (btn) btn.focus({ preventScroll:true });
+  const box = document.getElementById('mapCompare');
+  if (box) box.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function setMapCmpMetric(m) {
+  state.mapCmpMetric = m;
+  renderMapPanel();
+  const chip = document.querySelector('#mapCompare .chip[data-k="' + m + '"]');
+  if (chip) chip.focus({ preventScroll:true });
 }
 
 /* ============================================================
