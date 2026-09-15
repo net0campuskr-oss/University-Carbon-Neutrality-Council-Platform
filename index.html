@@ -639,6 +639,10 @@ section.timeline{margin-top:36px}
 /* [지도] 권역 배출 총량이 많을수록 진한 주황·빨강 — 파란 대학 마커와 겹치지 않는 따뜻한 색 계열 */
 #koreaBaseMap .st0{fill:var(--province-fill,#D9DEE5);stroke:#FFFFFF;stroke-width:.6;vector-effect:non-scaling-stroke;transition:fill .18s ease}
 #koreaBaseMap .korea-province:hover .st0{filter:brightness(.94)}
+/* 시·도 경계 강조: 시·도마다 굵은 흰 선 복사본을 바로 아래에 깔고 원래 시·도를 덮어,
+   시·도 경계만 굵게 보이게 합니다(시·군·구 경계는 가는 선 유지) */
+#koreaBaseMap .province-outline{pointer-events:none}
+#koreaBaseMap .province-outline .st0{fill:#fff;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
 /* 마커·라벨은 확대 배율과 상관없이 화면에서 같은 크기(px)로 그립니다 */
 .map-marker{cursor:pointer;outline:none}
 .map-marker .marker-hit{fill:transparent}
@@ -3920,6 +3924,17 @@ function prepareKoreaSvg(svg) {
         ['참여 대학', cnt + '개교']
       ], sourceLine('carbon'))));
     }
+  });
+  /* 시·도 경계 강조 — 시·도마다 복사본(굵은 흰 선)을 원래 시·도 바로 아래에 깝니다.
+     먼저 그린 시·도 위로 뒤에 그린 시·도의 굵은 선 절반이 남아 모든 시·도 경계가 굵게 보입니다. */
+  [...svg.children].filter(g => g.classList.contains('korea-province')).forEach(g => {
+    const ring = g.cloneNode(true);
+    ring.querySelectorAll('title').forEach(t => t.remove());
+    ring.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+    ['id', 'data-tip', 'style'].forEach(a => ring.removeAttribute(a));
+    ring.setAttribute('class', 'province-outline');
+    ring.setAttribute('aria-hidden', 'true');
+    g.before(ring);
   });
 }
 /* ---------- 지도 확대·이동(카메라) ----------
