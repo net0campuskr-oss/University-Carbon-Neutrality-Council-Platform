@@ -622,62 +622,79 @@ section.timeline{margin-top:36px}
 .map-toolbar-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;color:var(--ink-strong)}
 .map-toolbar-title .map-live{width:8px;height:8px;border-radius:50%;background:var(--down);box-shadow:0 0 0 4px rgba(21,128,61,.1)}
 .map-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.map-view-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 13px;color:var(--ink-soft);font-size:12px;font-weight:800;min-height:40px;transition:.15s}
+.map-view-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 13px;color:var(--ink-soft);font-size:13px;font-weight:800;min-height:40px;transition:.15s}
 .map-view-btn:hover{border-color:var(--accent-line);color:var(--accent)}
 .map-view-btn.on{border-color:var(--accent);background:var(--accent);color:#fff}
 #koreaMap{
   position:relative;width:100%;height:560px;border-radius:12px;overflow:hidden;
-  background:radial-gradient(circle at 50% 42%,#FFFFFF 0%,#F7FAFE 44%,#EAF1FB 100%);
+  background:radial-gradient(circle at 50% 42%,#FFFFFF 0%,#F7FAFE 48%,#EDF2F9 100%);
   border:1px solid var(--line);isolation:isolate;
 }
-.korea-map-viewport{position:relative;width:100%;height:100%;overflow:hidden}
+.korea-map-viewport{position:relative;width:100%;height:100%;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+/* 확대 중에는 마우스·한 손가락 드래그로 지도를 옮깁니다 */
+.korea-map-viewport.zoomed{touch-action:none;cursor:grab}
+.korea-map-viewport.dragging{cursor:grabbing}
 #koreaBaseMap{position:relative;z-index:1;width:100%;height:100%;display:block;animation:koreaMapIn .4s cubic-bezier(.2,.8,.2,1)}
 @keyframes koreaMapIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
-/* [지도] 배출량이 많을수록 진한 파랑이 되도록 단계 색을 시도 구역에 적용 */
-#koreaBaseMap .st0{fill:var(--province-fill,#E6EEF9);stroke:#FFFFFF;stroke-width:.7;vector-effect:non-scaling-stroke;transition:fill .18s ease}
-#koreaBaseMap .st1{fill:none;stroke:#AFC2DA;stroke-width:.8;vector-effect:non-scaling-stroke}
-#koreaBaseMap .korea-province:hover .st0{filter:brightness(.96)}
-.map-marker{cursor:pointer;outline:none;pointer-events:bounding-box}
-.map-marker .marker-origin-line{stroke:#8496AE;stroke-width:.8;stroke-dasharray:2 1.5;opacity:.55;vector-effect:non-scaling-stroke}
-.map-marker .marker-origin{fill:#8496AE;opacity:.66}
-.map-marker .marker-ring{fill:rgba(29,78,216,.14);stroke:none;transition:.18s}
-.map-marker .marker-dot{fill:var(--accent);stroke:#fff;stroke-width:2;vector-effect:non-scaling-stroke;transition:.18s}
-.map-marker .marker-label{fill:#26333F;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-weight:900;paint-order:stroke;stroke:#fff;stroke-linejoin:round;pointer-events:none}
-.map-marker:hover .marker-dot,.map-marker:focus .marker-dot{fill:var(--accent-hover);filter:drop-shadow(0 2px 3px rgba(29,78,216,.34))}
-.map-marker:hover .marker-ring,.map-marker:focus .marker-ring{fill:rgba(29,78,216,.24)}
+/* [지도] 권역 배출 총량이 많을수록 진한 주황·빨강 — 파란 대학 마커와 겹치지 않는 따뜻한 색 계열 */
+#koreaBaseMap .st0{fill:var(--province-fill,#D9DEE5);stroke:#FFFFFF;stroke-width:.6;vector-effect:non-scaling-stroke;transition:fill .18s ease}
+#koreaBaseMap .korea-province:hover .st0{filter:brightness(.94)}
+/* 마커·라벨은 확대 배율과 상관없이 화면에서 같은 크기(px)로 그립니다 */
+.map-marker{cursor:pointer;outline:none}
+.map-marker .marker-hit{fill:transparent}
+.map-marker .marker-ring{fill:rgba(255,255,255,.62);transition:fill .18s}
+.map-marker .marker-dot{fill:var(--accent);stroke:#fff;stroke-width:2;transition:fill .18s}
+.map-marker .marker-label{fill:#1B2430;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;font-size:13px;font-weight:800;paint-order:stroke;stroke:#fff;stroke-width:3.5px;stroke-linejoin:round}
+.map-marker:hover .marker-dot,.map-marker:focus-visible .marker-dot{fill:var(--accent-hover)}
+.map-marker:hover .marker-ring,.map-marker:focus-visible .marker-ring{fill:rgba(29,78,216,.28)}
+.map-marker:focus-visible .marker-ring{stroke:var(--focus);stroke-width:2}
 .map-marker.selected .marker-dot,.map-marker.mine .marker-dot{fill:var(--mine)}
-.map-marker.selected .marker-ring,.map-marker.mine .marker-ring{fill:rgba(180,83,9,.22)}
+.map-marker.selected .marker-ring,.map-marker.mine .marker-ring{fill:#fff;stroke:var(--mine);stroke-width:1.5}
 .map-marker.selected .marker-label,.map-marker.mine .marker-label{fill:var(--mine)}
-.map-marker.pending .marker-dot{fill:#9AA8BA}
-.map-marker.pending .marker-label{fill:#7A879A}
+.map-marker.pending .marker-dot{fill:#8C99AB}
+.map-marker.pending .marker-label{fill:#5F6B7A}
 .capital-cluster{cursor:pointer;outline:none}
-.capital-cluster .cluster-halo{fill:rgba(29,78,216,.12);stroke:var(--accent);stroke-width:1.2;stroke-dasharray:4 2;vector-effect:non-scaling-stroke}
-.capital-cluster .cluster-core{fill:var(--accent);stroke:#fff;stroke-width:2.4;vector-effect:non-scaling-stroke}
-.capital-cluster .cluster-count{fill:#fff;font-family:"Noto Sans KR",sans-serif;font-weight:900;text-anchor:middle;pointer-events:none}
-.capital-cluster .cluster-label{fill:var(--accent);font-family:"Noto Sans KR",sans-serif;font-weight:900;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:3;stroke-linejoin:round;pointer-events:none}
-.capital-cluster:hover .cluster-core,.capital-cluster:focus .cluster-core{fill:var(--accent-hover)}
+.capital-cluster .cluster-halo{fill:rgba(255,255,255,.62);stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 3}
+.capital-cluster .cluster-core{fill:var(--accent);stroke:#fff;stroke-width:2.5}
+.capital-cluster .cluster-count{fill:#fff;font-family:"Noto Sans KR",sans-serif;font-size:13px;font-weight:900;text-anchor:middle;pointer-events:none}
+.capital-cluster .cluster-label{fill:var(--accent);font-family:"Noto Sans KR",sans-serif;font-size:13px;font-weight:900;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.capital-cluster:hover .cluster-core,.capital-cluster:focus-visible .cluster-core{fill:var(--accent-hover)}
 .capital-cluster.mine .cluster-core,.capital-cluster.selected .cluster-core{fill:var(--mine)}
+/* [지도] 확대 단계별 숨김·노출 — 수도권 묶음 ↔ 대학별 마커, 서로 겹치는 라벨 */
+#koreaBaseMap .map-marker,#koreaBaseMap .capital-cluster{transition:opacity .2s ease,visibility .2s}
+#koreaBaseMap .marker-label{transition:opacity .15s ease,visibility .15s}
+#koreaBaseMap .lod-hidden,#koreaBaseMap .marker-label.label-hidden{opacity:0;visibility:hidden;pointer-events:none}
+#koreaBaseMap .map-marker:hover .marker-label.label-hidden,#koreaBaseMap .map-marker:focus-visible .marker-label.label-hidden{opacity:1;visibility:visible}
 .korea-map-legend{
-  position:absolute;left:10px;bottom:10px;z-index:4;background:rgba(255,255,255,.94);
-  border:1px solid var(--line);border-radius:10px;padding:9px 11px;
-  font-size:10.5px;font-weight:800;color:var(--ink-soft);backdrop-filter:blur(5px);
+  position:absolute;left:10px;bottom:10px;z-index:4;background:rgba(255,255,255,.95);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  font-size:12.5px;font-weight:800;color:var(--ink);backdrop-filter:blur(5px);
 }
-.korea-map-legend .scale{display:flex;align-items:center;gap:0;margin:6px 0 4px}
-.korea-map-legend .scale i{width:20px;height:9px;display:block}
+.korea-map-legend .scale{display:flex;align-items:center;gap:2px;margin:7px 0 4px}
+.korea-map-legend .scale i{width:26px;height:11px;display:block}
 .korea-map-legend .scale i:first-child{border-radius:3px 0 0 3px}
 .korea-map-legend .scale i:last-child{border-radius:0 3px 3px 0}
-.korea-map-legend .scale-label{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink-faint);font-weight:700}
-.korea-map-legend .dotline{display:flex;align-items:center;gap:5px;margin-top:5px}
-.legend-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 1px rgba(29,78,216,.3)}
+.korea-map-legend .scale-label{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);font-weight:700}
+.korea-map-legend .dotline{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:var(--ink-soft)}
+.legend-dot{width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 1px rgba(29,78,216,.3)}
 .legend-dot.mine{background:var(--mine)}
 .map-reset-float{
   position:absolute;top:10px;left:10px;z-index:4;background:rgba(255,255,255,.96);
-  border:1px solid var(--line);border-radius:999px;padding:9px 13px;font-size:12px;font-weight:900;
+  border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:13px;font-weight:900;
   color:var(--accent);display:none;min-height:40px;
 }
 .map-reset-float.show{display:block}
+/* 확대·축소 버튼 — 휠·핀치를 쓰기 어려운 환경과 키보드 사용자용 */
+.map-zoom{
+  position:absolute;top:10px;right:10px;z-index:4;display:flex;flex-direction:column;overflow:hidden;
+  background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 3px rgba(15,23,42,.08);
+}
+.map-zoom button{width:40px;height:40px;display:grid;place-items:center;font-size:21px;font-weight:700;line-height:1;color:var(--ink);transition:background .15s,color .15s}
+.map-zoom button+button{border-top:1px solid var(--line)}
+.map-zoom button:hover:not(:disabled){background:var(--accent-soft);color:var(--accent)}
+.map-zoom button:disabled{color:var(--line-strong);cursor:default}
 .map-missing{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:26px;color:var(--ink-soft);font-size:13.5px;z-index:5}
-.map-attribution{padding:8px 8px 0;font-size:9.5px;color:var(--ink-faint);line-height:1.5}
+.map-attribution{padding:8px 8px 0;font-size:12px;color:var(--ink-faint);line-height:1.5}
 .mapside{display:flex;flex-direction:column;gap:14px}
 .mappanel{min-height:170px}
 .mappanel .mp-in{padding:20px}
@@ -686,6 +703,98 @@ section.timeline{margin-top:36px}
 .mappanel .mp-rank{display:inline-block;background:var(--accent);color:#fff;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:900;margin:9px 0 10px}
 .mappanel .mp-stat{font-size:13.5px;color:var(--ink-soft);line-height:1.85}
 .mappanel .mp-stat b{color:var(--ink-strong)}
+
+/* ============================================================
+   플랫폼 소개 (kuce-platform-intro.html 이식 · 신규 클래스는 모두 pf- 접두사)
+============================================================ */
+/* 섹션 간 간격 — 기존 .about-sec / section.timeline 과 동일하게 36px */
+.pf-sec{margin-top:36px}
+.pf-sec:first-of-type{margin-top:0}
+
+/* ---------- [섹션 1] 히어로 ---------- */
+.pf-hero-lead{
+  margin:14px auto 0;max-width:62ch;
+  font-size:15px;color:var(--ink-soft);font-weight:500;line-height:1.8;
+  text-align:left;
+}
+/* 플랫폼명 미정 표시 — 확정 후 .pf-tbd 클래스만 제거하면 일반 텍스트가 됩니다 */
+.pf-tbd{
+  background:var(--mine-soft);color:var(--mine);
+  border:1px dashed var(--mine-line);border-radius:6px;
+  padding:0 6px;font-weight:800;white-space:nowrap;
+}
+
+/* ---------- [섹션 2] 배경 문단 ---------- */
+.pf-context{padding:22px 24px;display:flex;flex-direction:column;gap:12px}
+.pf-context p{font-size:14.5px;line-height:1.85;color:var(--ink)}
+.pf-context p + p{color:var(--ink-soft);font-size:13.5px}
+
+/* ---------- [섹션 3] 미션 3단 카드 ---------- */
+.pf-mission-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.pf-mission-card{padding:20px;display:flex;flex-direction:column}
+.pf-mission-no{
+  font-size:12px;font-weight:900;color:var(--accent);
+  letter-spacing:.04em;margin-bottom:10px;
+}
+.pf-ico{margin-bottom:8px;color:var(--accent)}
+.pf-mission-title{font-size:15px;font-weight:800;color:var(--ink-strong)}
+.pf-mission-desc{font-size:13px;color:var(--ink-soft);margin-top:6px;line-height:1.65}
+
+/* 아이콘 전환 — <main id="page-platform" data-icon="emoji"> / "svg" */
+.pf-ico .ico-emoji{font-size:24px;line-height:1}
+.pf-ico .ico-svg{width:26px;height:26px}
+[data-icon="emoji"] .ico-svg{display:none}
+[data-icon="svg"] .ico-emoji{display:none}
+
+/* ---------- [섹션 4] 협의체 소개 배너 ---------- */
+.pf-banner{
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:var(--radius);padding:22px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.pf-banner-text{flex:1 1 320px;min-width:0}
+.pf-banner-note{font-size:13px;color:var(--ink-soft);line-height:1.7;margin-top:6px}
+.pf-banner-label{font-size:15px;font-weight:800;color:var(--ink-strong)}
+
+/* ---------- [섹션 5] 제공 정보 및 서비스 ---------- */
+.pf-svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.pf-svc-card{padding:20px;display:flex;flex-direction:column}
+.pf-svc-title{font-size:15px;font-weight:800;color:var(--ink-strong);margin-top:2px}
+.pf-svc-desc{font-size:13px;color:var(--ink-soft);margin-top:6px;line-height:1.65}
+.pf-source{
+  margin-top:14px;padding:12px 14px;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);
+  font-size:12.5px;color:var(--ink-soft);line-height:1.7;
+}
+
+/* ---------- [섹션 6] 함께하는 기관 ---------- */
+.pf-org-list{display:flex;flex-wrap:wrap;gap:10px}
+.pf-org{
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  padding:11px 18px;font-size:14px;font-weight:700;color:var(--ink);
+  display:inline-flex;align-items:center;gap:8px;box-shadow:var(--shadow);
+}
+.pf-org.is-empty{
+  background:transparent;border-style:dashed;border-color:var(--line-strong);
+  color:var(--ink-soft);font-weight:600;box-shadow:none;
+}
+
+/* ---------- [섹션 7] Contact ---------- */
+.pf-contact{padding:22px 24px}
+.pf-contact-lead{font-size:14px;color:var(--ink);line-height:1.8}
+.pf-contact-list{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.pf-contact-list li{display:flex;align-items:center;gap:10px;font-size:14px}
+.pf-contact-key{
+  flex:0 0 84px;font-size:12.5px;font-weight:800;color:var(--ink-soft);
+}
+.pf-contact-list a{font-weight:700}
+
+/* ---------- 스크롤 진입 페이드인 ---------- */
+.pf-reveal{opacity:0;transform:translateY(5px);transition:opacity .4s ease,transform .4s ease}
+.pf-reveal.is-in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .pf-reveal{opacity:1;transform:none;transition:none}
+}
 
 /* ---------- [C-1] 404 ---------- */
 .err-wrap{max-width:560px;margin:40px auto;text-align:center;padding:44px 26px}
@@ -761,6 +870,15 @@ section.timeline{margin-top:36px}
   .rankrow .val{font-size:12.5px}
   .top5card .rankrow{grid-template-columns:40px 1fr 92px}
   #koreaMap{height:min(62vh,480px)}
+  .korea-map-legend{left:8px;bottom:8px;padding:8px 10px}
+  .korea-map-legend .scale i{width:20px;height:10px}
+  .korea-map-legend .dotline{display:none}
+  .pf-hero-lead{font-size:14.5px;margin-top:12px}
+  .pf-context,.pf-contact{padding:18px 16px}
+  .pf-banner{padding:18px 16px;flex-direction:column;align-items:stretch}
+  .pf-banner .btn{width:100%}
+  .pf-contact-list li{flex-direction:column;align-items:flex-start;gap:2px}
+  .pf-contact-key{flex:none}
   .mapcard{padding:9px}
   .map-tools{width:100%}
   .detail-head h2{font-size:21px}
@@ -784,7 +902,7 @@ section.timeline{margin-top:36px}
     </div>
     <nav class="gnb" aria-label="주요 메뉴">
       <button type="button" data-page="home" onclick="go('home')">홈</button>
-      <button type="button" data-page="about" onclick="go('about')">소개</button>
+      <button type="button" data-page="platform" onclick="go('platform')">소개</button>
       <button type="button" data-page="compare" onclick="go('compare')">학교비교</button>
       <button type="button" data-page="map" onclick="go('map')">전국지도</button>
       <button type="button" data-page="notice" onclick="go('notice')">공지사항</button>
@@ -817,7 +935,7 @@ section.timeline{margin-top:36px}
   </div>
   <nav>
     <button type="button" data-page="home" onclick="go('home')">홈</button>
-    <button type="button" data-page="about" onclick="go('about')">소개</button>
+    <button type="button" data-page="platform" onclick="go('platform')">소개</button>
     <button type="button" data-page="compare" onclick="go('compare')">학교비교 데이터</button>
     <button type="button" data-page="map" onclick="go('map')">전국지도</button>
     <button type="button" data-page="notice" onclick="go('notice')">공지사항</button>
@@ -964,6 +1082,220 @@ section.timeline{margin-top:36px}
       </div>
     </div>
   </section>
+</main>
+
+<!-- ================= 플랫폼 소개 (상단 '소개' 메뉴) ================= -->
+<main class="page" id="page-platform" data-icon="emoji">
+
+  <div class="crumb"><button type="button" onclick="go('home')">홈</button> › 플랫폼 소개</div>
+
+  <!-- [섹션 1] 히어로 — 플랫폼 정의 -->
+  <section class="pf-sec" aria-labelledby="pf-h1">
+    <div class="hero">
+      <h1 id="pf-h1"><span class="platform-name pf-tbd">[플랫폼명]</span>은?</h1>
+      <p class="pf-hero-lead">
+        <span class="platform-name pf-tbd">[플랫폼명]</span>은 대학 탄소중립의 현주소를 공개하기 위해
+        전국대학탄소중립학생협의체가 구축한 대학의 환경정보 공개 플랫폼입니다.
+        국내 대학의 환경정보를 투명하게 공개함으로써 대학의 실질적인 탄소중립 전환을
+        이끌어내는 것을 목표로 합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- [섹션 2] 배경 — 대학의 책무 -->
+  <section class="pf-sec pf-reveal">
+    <h2 class="sr-only">플랫폼을 운영하는 배경</h2>
+    <div class="card pf-context">
+      <p>
+        대학은 다량의 에너지를 소비하고 탄소를 배출하는 대형 시설인 동시에, 미래 세대를
+        키워내는 교육 기관으로서 탄소중립을 선도할 책무가 있습니다.
+      </p>
+      <p>
+        이에 우리는 다음의 미션을 목표로 플랫폼을 운영해가고자 합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- [섹션 3] 미션 3가지 — 아이콘은 이모지/SVG 두 벌, <main data-icon="..."> 값으로 전환 -->
+  <section class="pf-sec pf-reveal" aria-labelledby="pf-mission">
+    <h2 class="section-title" id="pf-mission"><span aria-hidden="true">🎯</span> 우리의 미션</h2>
+    <div class="pf-mission-grid">
+
+      <!-- Mission 1 -->
+      <article class="card pf-mission-card">
+        <div class="pf-ico">
+          <span class="ico-emoji" aria-hidden="true">📢</span>
+          <!-- 확성기: 정보를 널리 알리는 '대중화' -->
+          <span class="ico-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 10v4a1 1 0 0 0 1 1h3l5 4V5L7 9H4a1 1 0 0 0-1 1Z"/>
+              <path d="M16.5 8.5a5 5 0 0 1 0 7"/>
+              <path d="M19.5 6a9 9 0 0 1 0 12"/>
+            </svg>
+          </span>
+        </div>
+        <div class="pf-mission-no">Mission 1</div>
+        <h3 class="pf-mission-title">대학 환경 정보의 대중화</h3>
+        <p class="pf-mission-desc">전국 대학의 환경 데이터를 수집하고, 누구나 이해하기 쉬운 형태로 공개합니다.</p>
+      </article>
+
+      <!-- Mission 2 -->
+      <article class="card pf-mission-card">
+        <div class="pf-ico">
+          <span class="ico-emoji" aria-hidden="true">📋</span>
+          <!-- 체크리스트 문서: 공개 '의무화'와 평가 지표 반영 -->
+          <span class="ico-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/>
+              <rect x="8" y="2.5" width="8" height="3.6" rx="1.2"/>
+              <path d="m8.5 12.4 1.9 1.9 3.9-3.9"/>
+              <path d="M8.5 17.6h7"/>
+            </svg>
+          </span>
+        </div>
+        <div class="pf-mission-no">Mission 2</div>
+        <h3 class="pf-mission-title">정보 공개 및 평가의 제도화</h3>
+        <p class="pf-mission-desc">대학의 환경 정보 공개를 의무하고, 이를 대학 평가 지표에 반영합니다.</p>
+      </article>
+
+      <!-- Mission 3 -->
+      <article class="card pf-mission-card">
+        <div class="pf-ico">
+          <span class="ico-emoji" aria-hidden="true">🌱</span>
+          <!-- 하강 화살표 + 잎: 실질적인 '탄소 감축' -->
+          <span class="ico-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v9.5"/>
+              <path d="m8.2 9 3.8 3.8L15.8 9"/>
+              <path d="M12 21c0-3.6 2.6-6.2 6.2-6.2C18.2 18.4 15.6 21 12 21Z"/>
+              <path d="M12 21c0-3.6-2.6-6.2-6.2-6.2C5.8 18.4 8.4 21 12 21Z"/>
+            </svg>
+          </span>
+        </div>
+        <div class="pf-mission-no">Mission 3</div>
+        <h3 class="pf-mission-title">대학의 탄소중립 이행</h3>
+        <p class="pf-mission-desc">투명하게 데이터 공개를 통해 대학의 자발적이고 실질적인 탄소 감축을 유도합니다.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- [섹션 4] 협의체 소개 배너 — 기존 '협의체 소개' 화면으로 연결 -->
+  <section class="pf-sec pf-reveal">
+    <h2 class="sr-only">전국대학탄소중립학생협의체</h2>
+    <div class="pf-banner">
+      <div class="pf-banner-text">
+        <div class="pf-banner-label">전국대학탄소중립학생협의체</div>
+        <p class="pf-banner-note">
+          대학의 탄소중립 실현을 목표로 정책을 제안하고, 교육과 공론장을 통해 변화를
+          만들어가는 학생 단체입니다.
+        </p>
+      </div>
+      <button class="btn btn-primary" type="button" onclick="go('about')">전국대학탄소중립학생협의체 알아보기 →</button>
+    </div>
+  </section>
+
+  <!-- [섹션 5] 제공 정보 및 서비스 -->
+  <section class="pf-sec pf-reveal" aria-labelledby="pf-svc">
+    <h2 class="section-title" id="pf-svc"><span aria-hidden="true">📊</span> 제공 정보 및 서비스</h2>
+    <div class="pf-svc-grid">
+
+      <article class="card pf-svc-card">
+        <div class="pf-ico">
+          <span class="ico-emoji" aria-hidden="true">📈</span>
+          <span class="ico-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 20V4"/><path d="M4 20h16"/>
+              <rect x="7.5" y="11" width="3.2" height="6" rx="1"/>
+              <rect x="13.3" y="7.5" width="3.2" height="9.5" rx="1"/>
+            </svg>
+          </span>
+        </div>
+        <h3 class="pf-svc-title">정량적 데이터</h3>
+        <p class="pf-svc-desc">각 대학 연도별 탄소배출량 및 에너지사용량 등 정량적 데이터 (1인당, 면적당 데이터 포함)</p>
+      </article>
+
+      <article class="card pf-svc-card">
+        <div class="pf-ico">
+          <span class="ico-emoji" aria-hidden="true">📄</span>
+          <span class="ico-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/>
+              <path d="M14 3v5h5"/>
+              <path d="M8.8 13h6.4"/><path d="M8.8 16.6h4.4"/>
+            </svg>
+          </span>
+        </div>
+        <h3 class="pf-svc-title">정성적 데이터</h3>
+        <p class="pf-svc-desc">대학별 탄소중립보고서 등 정성적 데이터</p>
+      </article>
+
+      <article class="card pf-svc-card">
+        <div class="pf-ico">
+          <span class="ico-emoji" aria-hidden="true">⚖️</span>
+          <span class="ico-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3.5" y="9" width="6" height="11" rx="1.4"/>
+              <rect x="14.5" y="4.5" width="6" height="15.5" rx="1.4"/>
+              <path d="M6.5 6.2V4"/><path d="M17.5 2.2v.6"/>
+            </svg>
+          </span>
+        </div>
+        <h3 class="pf-svc-title">대학 간 데이터 비교</h3>
+        <p class="pf-svc-desc">관심 대학을 선택해 주요 지표 직접 비교</p>
+      </article>
+
+      <article class="card pf-svc-card">
+        <div class="pf-ico">
+          <span class="ico-emoji" aria-hidden="true">⬇️</span>
+          <span class="ico-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.5v11"/>
+              <path d="m7.8 10.4 4.2 4.2 4.2-4.2"/>
+              <path d="M4.5 19.5h15"/>
+            </svg>
+          </span>
+        </div>
+        <h3 class="pf-svc-title">데이터 다운로드</h3>
+        <p class="pf-svc-desc">플랫폼의 모든 데이터는 원클릭으로 다운로드 가능</p>
+      </article>
+
+    </div>
+
+    <!-- 데이터 출처 각주 — 보완 출처가 정해지면 .pf-tbd 부분을 교체하세요 -->
+    <p class="pf-source">
+      *데이터 출처: 본 플랫폼의 자료는 GIR를 기반으로 수집되었으며, 부족한 자료의 경우
+      <span class="pf-tbd">~</span>를 활용하여 보완하였습니다.
+    </p>
+  </section>
+
+  <!-- [섹션 6] 함께하는 기관 — 기관이 추가되면 .pf-org 를 복제하고, 마지막 is-empty 항목은 지우세요 -->
+  <section class="pf-sec pf-reveal" aria-labelledby="pf-org">
+    <h2 class="section-title" id="pf-org"><span aria-hidden="true">🤝</span> 함께하는 기관</h2>
+    <ul class="pf-org-list">
+      <li class="pf-org">서울대학교 탄소중립캠퍼스추진단</li>
+      <li class="pf-org is-empty">[추가 협력 기관명]</li>
+    </ul>
+  </section>
+
+  <!-- [섹션 7] Contact -->
+  <section class="pf-sec pf-reveal" aria-labelledby="pf-contact">
+    <h2 class="section-title" id="pf-contact"><span aria-hidden="true">✉️</span> Contact</h2>
+    <div class="card pf-contact">
+      <p class="pf-contact-lead">데이터 오류 신고 및 문의, 제안사항은 아래 메일로 연락해 주시기 바랍니다.</p>
+      <ul class="pf-contact-list">
+        <li>
+          <span class="pf-contact-key">Email</span>
+          <a href="mailto:net0campus.kr@gmail.com">net0campus.kr@gmail.com</a>
+        </li>
+        <li>
+          <span class="pf-contact-key">instagram</span>
+          <a href="https://www.instagram.com/net0campus" target="_blank" rel="noopener">@net0campus</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
 </main>
 
 <!-- ================= 협의체 소개 ================= -->
@@ -1345,7 +1677,7 @@ section.timeline{margin-top:36px}
 --><template id="koreaSvgTemplate">
   <svg id="koreaBaseMap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 509 716.1" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="koreaMapSvgTitle koreaMapSvgDesc">
   <title id="koreaMapSvgTitle">대한민국 행정구역과 참여 대학 위치</title>
-  <desc id="koreaMapSvgDesc">대한민국의 실제 시군구 경계 위에 KUCE 참여 대학의 위치를 표시한 지도입니다.</desc>
+  <desc id="koreaMapSvgDesc">대한민국 행정구역 지도 위에 KUCE 참여 대학의 위치를 표시한 지도입니다.</desc>
 
 <g id="제주특별자치도">
 	<path id="서귀포시" class="st0" d="M454.8,669.3l21.4-9.5l0.4,0.6l0.2,0l2.8,0.5l-0.6,3.2l1.7-3.6l1.2,3.3l-14.3,22.6l-8.1,0.8
@@ -2087,13 +2419,6 @@ section.timeline{margin-top:36px}
 		152.8,160.4 153.8,157.4 	"/>
 	<polygon id="성동구" class="st0" points="161.9,166.5 168,168.4 165.9,173.3 161.1,172.4 160,170.8 	"/>
 </g>
-<g id="레이어_1">
-	<path class="st1" d="M499.2,715.6h-133v-85h133V715.6z"/>
-	<path class="st1" d="M31,194.4H0.5v-30.5H31V194.4z"/>
-	<path class="st1" d="M46.2,194.1H36v-10.2h10.2V194.1z"/>
-	<path class="st1" d="M497,370.9h-24v-24h24V370.9z"/>
-	<path class="st1" d="M508.5,370.6h-8.2v-8.2h8.2V370.6z"/>
-</g>
 </svg>
 </template>
 
@@ -2336,7 +2661,7 @@ const state = {
   selected: [],
   detailId: null,
   detailTab: 'carbon',
-  mapView: 'national',
+  mapCam: null,
   mapSel: null,
   my: null
 };
@@ -2576,9 +2901,10 @@ drawer.addEventListener('keydown', e => {
 /* ============================================================
    [A-3][C-1] 라우팅 — 루트 진입은 항상 홈, 없는 주소는 404
 ============================================================ */
-const PAGES = ['home', 'about', 'compare', 'map', 'notice', 'detail', '404'];
+const PAGES = ['home', 'platform', 'about', 'compare', 'map', 'notice', 'detail', '404'];
 const TITLES = {
   home: 'KUCE | 전국 대학 탄소중립 정보공개 플랫폼',
+  platform: '플랫폼 소개 | KUCE',
   about: '협의체 소개 | KUCE',
   compare: '학교 비교 데이터 | KUCE',
   map: '전국지도 | KUCE',
@@ -2658,7 +2984,8 @@ function go(page, opts, fromHash) {
   if (el) el.classList.add('active');
 
   document.querySelectorAll('.gnb button, .drawer nav button').forEach(b => {
-    const target = page === 'detail' ? 'compare' : page;
+    /* 협의체 소개는 '소개' 메뉴 아래 화면이라 같은 메뉴를 켭니다 */
+    const target = page === 'detail' ? 'compare' : page === 'about' ? 'platform' : page;
     b.classList.toggle('on', b.dataset.page === target);
   });
   document.title = TITLES[page] || TITLES.home;
@@ -3521,21 +3848,23 @@ const MAP_LABELS = {
   cnu:'충남대', cbnu:'충북대', snu:'서울대',
   kaist:'KAIST', gist:'GIST', dgist:'DGIST', unist:'UNIST'
 };
-const CAPITAL_DISPLAY_POS = {
-  yonsei:[144.3,160.0], ewha:[144.4,168.0], skku:[153.0,151.0], korea:[160.8,153.4],
-  khu:[173.1,158.4], konkuk:[179.4,170.3], hanyang:[171.3,179.5], cau:[148.2,179.2], snu:[154.2,190.4]
+/* 라벨 위치(px): [가로, 글자 기준선, 정렬] — 점 중심 기준이라 확대해도 화면에서 같은 간격을 유지합니다 */
+const LABEL_OFFSET = {
+  kangwon:[10,5,'start'], knu:[-10,-4,'end'], gnu:[-10,-8,'end'], pnu:[-10,5,'end'],
+  jnu:[10,5,'start'], jbnu:[-10,5,'end'], cnu:[10,15,'start'], cbnu:[10,-2,'start'],
+  keimyung:[-12,2,'end'], yu:[10,5,'start'], postech:[-10,-4,'end'],
+  kaist:[10,3,'start'], gist:[-10,14,'end'], dgist:[-10,14,'end'], unist:[10,12,'start'],
+  /* 수도권: 확대해서 대학별 마커가 펼쳐졌을 때 기준 */
+  yonsei:[-10,-3,'end'], ewha:[-10,10,'end'], skku:[-10,-4,'end'], korea:[10,5,'start'],
+  khu:[10,5,'start'], hanyang:[-10,5,'end'], konkuk:[10,5,'start'], cau:[-10,5,'end'], snu:[10,5,'start']
 };
-const NATIONAL_LABEL_OFFSET = {
-  kangwon:[9,3,'start'], knu:[-10,-7,'end'], gnu:[-10,4,'end'], pnu:[-10,5,'end'],
-  jnu:[10,4,'start'], jbnu:[-10,4,'end'], cnu:[10,4,'start'], cbnu:[10,-6,'start'],
-  keimyung:[-9,13,'end'], yu:[10,5,'start'], postech:[-10,-8,'end'],
-  kaist:[10,-6,'start'], gist:[-10,10,'end'], dgist:[-9,-7,'end'], unist:[10,8,'start']
-};
-const CAPITAL_LABEL_OFFSET = {
-  ewha:[-2.0,.8,'end'], yonsei:[-2.0,-1.2,'end'], skku:[-1.8,-1.1,'end'], korea:[1.9,-.8,'start'],
-  khu:[1.9,-.7,'start'], konkuk:[1.8,.7,'start'], hanyang:[1.8,1.1,'start'], cau:[-1.9,1.0,'end'], snu:[1.8,1.2,'start']
-};
-const KOREA_VIEWBOX = { national:[0,0,509,716.1], capital:[108,138,100,68] };
+const MAP_W = 509, MAP_H = 716.1;
+const CAPITAL_BOX = [108, 138, 100, 68];   /* '수도권 확대' 버튼이 보여 주는 영역 */
+const CAPITAL_PIN = [154, 169];            /* 전국 화면에서 수도권 묶음을 그리는 위치 */
+const CAPITAL_SPLIT_PX = 2.6;              /* 지도 1단위가 2.6px 이상으로 커지면 수도권 묶음을 대학별 마커로 펼칩니다 */
+const CAPITAL_MIN_PX = 6.5;                /* '수도권 확대'의 최소 배율 — 좁은 화면에서도 9개 대학 라벨이 겹치지 않게 */
+const MAP_MAX_ZOOM = 16;
+const MARKER_R = 5.5, HIT_R = 13;
 /* 시·도 → 권역 매핑: 배출량이 많은 권역일수록 지도 색을 진하게 칠합니다 */
 const PROVINCE_REGION = {
   '서울특별시':'수도권','경기도':'수도권','인천광역시':'수도권',
@@ -3545,7 +3874,8 @@ const PROVINCE_REGION = {
   '경상남도':'영남권','경상북도':'영남권','부산광역시':'영남권','대구광역시':'영남권','울산광역시':'영남권',
   '제주특별자치도':null
 };
-const CHORO = ['#EDF3FC', '#D8E5F8', '#B7CEF2', '#82A7E7', '#3B6FE0'];
+/* 배출량 '열' 5단계(연주황→벽돌빨강, 밝음→어두움). 가장 밝은 단계도 지도 배경 대비 2:1 이상이라 땅이 또렷하게 보입니다 */
+const CHORO = ['#E29F6B', '#DD7D42', '#D25B21', '#BE3F15', '#A32A1A'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 function regionTotals() {
@@ -3576,10 +3906,9 @@ function prepareKoreaSvg(svg) {
   const totals = regionTotals();
   const shades = regionShadeMap(totals);
   svg.querySelectorAll(':scope > g').forEach(g => {
-    if (g.id === '레이어_1') return;
     g.classList.add('korea-province');
     const region = PROVINCE_REGION[g.id];
-    g.style.setProperty('--province-fill', region ? shades[region] : '#F1F5F9');
+    g.style.setProperty('--province-fill', region ? shades[region] : '#D9DEE5');   /* 참여 대학이 없는 제주 = 중립 회색 */
     const title = svgNode('title');
     title.textContent = g.id + (region ? ' · ' + region : '');
     g.prepend(title);
@@ -3593,10 +3922,44 @@ function prepareKoreaSvg(svg) {
     }
   });
 }
-function markerSizes(view) {
-  return view === 'capital'
-    ? { r:1.15, ring:2.15, font:2.2, stroke:.38, line:.28 }
-    : { r:5.2, ring:9.2, font:12.2, stroke:3.0, line:.8 };
+/* ---------- 지도 확대·이동(카메라) ----------
+   state.mapCam = { cx, cy, z } : 화면 가운데의 지도 좌표와 배율(전국이 꼭 맞는 크기 = 1).
+   마커·라벨에는 매번 역배율을 줘서 확대해도 화면에서 같은 크기(px)로 보이게 합니다. */
+const mapRt = {
+  host:null, vp:null, svg:null, reset:null, zin:null, zout:null, legend:null, zoomCtl:null, ro:null, overlays:[],
+  markers:[], cluster:null, w:0, h:0, fit:1, anim:0,
+  pts:new Map(), drag:null, pinch:null, dragged:false
+};
+const nationalCam = () => ({ cx:MAP_W / 2, cy:MAP_H / 2, z:1 });
+function measureMap() {
+  mapRt.w = mapRt.vp.clientWidth;
+  mapRt.h = mapRt.vp.clientHeight;
+  mapRt.fit = Math.min(mapRt.w / MAP_W, mapRt.h / MAP_H) || 1;
+  /* 범례·확대 버튼 영역: 그 아래로 들어가는 라벨은 가려지는 대신 숨깁니다 */
+  const vr = mapRt.vp.getBoundingClientRect();
+  mapRt.overlays = [mapRt.legend, mapRt.zoomCtl].map(el => {
+    const b = el.getBoundingClientRect();
+    return [b.left - vr.left, b.top - vr.top, b.right - vr.left, b.bottom - vr.top];
+  });
+}
+function camForBox(b) {
+  const s = Math.min(mapRt.w / b[2], mapRt.h / b[3]);
+  return { cx:b[0] + b[2] / 2, cy:b[1] + b[3] / 2, z:s / mapRt.fit };
+}
+function capitalCam() {
+  const c = camForBox(CAPITAL_BOX);
+  return { cx:c.cx, cy:c.cy, z:Math.max(c.z, CAPITAL_MIN_PX / mapRt.fit) };
+}
+/* 지도 가장자리가 화면 안쪽으로 들어오지 않도록 배율·중심을 제한합니다 */
+function clampCam(c) {
+  const z = Math.min(MAP_MAX_ZOOM, Math.max(1, c.z));
+  const s = mapRt.fit * z;
+  const lim = (v, span, full) => span >= full ? full / 2 : Math.min(full - span / 2, Math.max(span / 2, v));
+  return { cx:lim(c.cx, mapRt.w / s, MAP_W), cy:lim(c.cy, mapRt.h / s, MAP_H), z };
+}
+function camView(c) {
+  const s = mapRt.fit * c.z, w = mapRt.w / s, h = mapRt.h / s;
+  return { x:c.cx - w / 2, y:c.cy - h / 2, w, h, s };
 }
 function markerTip(u) {
   if (u.status === 'pending') {
@@ -3609,60 +3972,57 @@ function markerTip(u) {
     ['전국 순위', rankOf(u, 'carbon') + '위 / ' + ACTIVE.length + '개교']
   ], sourceLine('carbon'));
 }
-function addSchoolMarker(layer, u, view) {
-  const original = MAP_POS[u.id];
-  if (!original) return;
-  const display = view === 'capital' ? (CAPITAL_DISPLAY_POS[u.id] || original) : original;
-  const s = markerSizes(view);
+/* 마커는 실제 위치에 그립니다(예전의 '옮겨 그린 점 + 원래 위치 회색 점' 방식 제거) */
+function addSchoolMarker(layer, u) {
+  const [x, y] = MAP_POS[u.id];
+  const sel = state.mapSel === u.id, mine = state.my === u.id;
   const g = svgNode('g', {
-    class: 'map-marker' + (state.mapSel === u.id ? ' selected' : '') + (state.my === u.id ? ' mine' : '') +
+    class: 'map-marker' + (sel ? ' selected' : '') + (mine ? ' mine' : '') +
       (u.status === 'pending' ? ' pending' : ''),
     tabindex: '0', role: 'button',
     'aria-label': u.name + ' 선택',
     'data-tip': attr(markerTip(u))
   });
-  if (view === 'capital' && (Math.abs(display[0] - original[0]) > .2 || Math.abs(display[1] - original[1]) > .2)) {
-    g.appendChild(svgNode('line', { x1:original[0], y1:original[1], x2:display[0], y2:display[1], class:'marker-origin-line', 'stroke-width':s.line }));
-    g.appendChild(svgNode('circle', { cx:original[0], cy:original[1], r:.38, class:'marker-origin' }));
-  }
-  g.appendChild(svgNode('circle', { cx:display[0], cy:display[1], r:s.ring, class:'marker-ring' }));
-  g.appendChild(svgNode('circle', { cx:display[0], cy:display[1], r:s.r, class:'marker-dot' }));
-  const off = view === 'capital'
-    ? (CAPITAL_LABEL_OFFSET[u.id] || [1.8,.7,'start'])
-    : (NATIONAL_LABEL_OFFSET[u.id] || [9,4,'start']);
-  const text = svgNode('text', {
-    x:display[0] + off[0], y:display[1] + off[1], 'text-anchor':off[2],
-    class:'marker-label', 'font-size':s.font, 'stroke-width':s.stroke
-  });
+  const r = sel || mine ? MARKER_R + 1.5 : MARKER_R;
+  const body = svgNode('g', { class:'marker-body' });
+  body.appendChild(svgNode('circle', { r:HIT_R, class:'marker-hit' }));
+  body.appendChild(svgNode('circle', { r:r + 4.5, class:'marker-ring' }));
+  body.appendChild(svgNode('circle', { r, class:'marker-dot' }));
+  const off = LABEL_OFFSET[u.id] || [10, 5, 'start'];
+  const text = svgNode('text', { x:off[0], y:off[1], 'text-anchor':off[2], class:'marker-label' });
   text.textContent = mapLabel(u);
-  g.appendChild(text);
+  body.appendChild(text);
+  g.appendChild(body);
   const activate = e => {
     if (e.type === 'keydown' && !['Enter', ' '].includes(e.key)) return;
     e.preventDefault();
-    selectOnMap(u.id);
+    selectOnMap(u.id, e.type === 'keydown');
   };
   g.addEventListener('click', activate);
   g.addEventListener('keydown', activate);
   layer.appendChild(g);
+  mapRt.markers.push({ u, el:g, body, label:text, x, y, r, off, capital:isCapital(u), shown:true, tw:0,
+    pri:(sel || mine ? 100 : 0) + (u.status === 'active' ? 10 : 0) });
 }
 function addCapitalCluster(layer) {
   const list = UNIVERSITIES.filter(isCapital);
   const selected = list.some(u => u.id === state.mapSel);
   const mine = list.some(u => u.id === state.my);
-  const x = 154, y = 169;
   const g = svgNode('g', {
     class: 'capital-cluster' + (selected ? ' selected' : '') + (mine ? ' mine' : ''),
     tabindex:'0', role:'button', 'aria-label':'수도권 ' + list.length + '개 대학 확대',
     'data-tip': attr(tipBody('수도권 대학', [['대학 수', list.length + '개교'], ['보기', '클릭하면 확대됩니다']], null))
   });
-  g.appendChild(svgNode('circle', { cx:x, cy:y, r:22, class:'cluster-halo' }));
-  g.appendChild(svgNode('circle', { cx:x, cy:y, r:13, class:'cluster-core' }));
-  const count = svgNode('text', { x, y:y + 3.5, class:'cluster-count', 'font-size':11 });
+  const body = svgNode('g', { class:'cluster-body' });
+  body.appendChild(svgNode('circle', { r:24, class:'cluster-halo' }));
+  body.appendChild(svgNode('circle', { r:15, class:'cluster-core' }));
+  const count = svgNode('text', { y:4.5, class:'cluster-count' });
   count.textContent = list.length;
-  g.appendChild(count);
-  const label = svgNode('text', { x, y:y - 27, class:'cluster-label', 'font-size':12.2 });
-  label.textContent = '수도권 대학 · 클릭하여 확대';
-  g.appendChild(label);
+  body.appendChild(count);
+  const label = svgNode('text', { y:-31, class:'cluster-label' });
+  label.textContent = '수도권 대학';
+  body.appendChild(label);
+  g.appendChild(body);
   const activate = e => {
     if (e.type === 'keydown' && !['Enter', ' '].includes(e.key)) return;
     e.preventDefault();
@@ -3671,47 +4031,126 @@ function addCapitalCluster(layer) {
   g.addEventListener('click', activate);
   g.addEventListener('keydown', activate);
   layer.appendChild(g);
+  return { el:g, body, label, lw:0 };
 }
-function addMapMarkers(svg) {
+function buildMapMarkers() {
+  const old = mapRt.svg.querySelector('#kuceMapMarkers');
+  if (old) old.remove();
   const layer = svgNode('g', { id:'kuceMapMarkers' });
-  if (state.mapView === 'capital') {
-    UNIVERSITIES.filter(isCapital).forEach(u => addSchoolMarker(layer, u, 'capital'));
-  } else {
-    UNIVERSITIES.filter(u => !isCapital(u)).forEach(u => addSchoolMarker(layer, u, 'national'));
-    addCapitalCluster(layer);
+  mapRt.cluster = addCapitalCluster(layer);
+  mapRt.markers = [];
+  /* 선택·우리 학교는 마지막에 그려 다른 마커 위로 올라오게 합니다 */
+  const top = u => (state.mapSel === u.id || state.my === u.id) ? 2 : (u.status === 'active' ? 1 : 0);
+  UNIVERSITIES.filter(u => MAP_POS[u.id]).sort((a, b) => top(a) - top(b)).forEach(u => addSchoolMarker(layer, u));
+  mapRt.svg.appendChild(layer);
+  measureMapLabels();
+}
+function measureMapLabels() {
+  mapRt.markers.forEach(m => { m.tw = m.label.getComputedTextLength(); });
+  if (mapRt.cluster) mapRt.cluster.lw = mapRt.cluster.label.getComputedTextLength();
+}
+function setLod(el, show) {
+  el.classList.toggle('lod-hidden', !show);
+  el.setAttribute('tabindex', show ? '0' : '-1');
+  el.setAttribute('aria-hidden', show ? 'false' : 'true');
+}
+function applyMapCam() {
+  if (!mapRt.svg || !mapRt.w || !mapRt.cluster) return;
+  const cam = state.mapCam = clampCam(state.mapCam || nationalCam());
+  const v = camView(cam);
+  mapRt.svg.setAttribute('viewBox', [v.x, v.y, v.w, v.h].map(n => n.toFixed(2)).join(' '));
+  const scale = ') scale(' + (1 / v.s).toFixed(5) + ')';
+  /* [확대 단계별 숨김·노출] 충분히 확대하면 수도권 묶음을 숨기고 대학별 마커를 보여 줍니다 */
+  const split = v.s >= CAPITAL_SPLIT_PX;
+  mapRt.markers.forEach(m => {
+    m.shown = split || !m.capital;
+    setLod(m.el, m.shown);
+    m.body.setAttribute('transform', 'translate(' + m.x + ' ' + m.y + scale);
+  });
+  setLod(mapRt.cluster.el, !split);
+  mapRt.cluster.body.setAttribute('transform', 'translate(' + CAPITAL_PIN[0] + ' ' + CAPITAL_PIN[1] + scale);
+  layoutMapLabels(v, split);
+
+  const zoomed = cam.z > 1.01;
+  const cx = CAPITAL_BOX[0] + CAPITAL_BOX[2] / 2, cy = CAPITAL_BOX[1] + CAPITAL_BOX[3] / 2;
+  mapRt.vp.classList.toggle('zoomed', zoomed);
+  mapRt.reset.classList.toggle('show', zoomed);
+  mapRt.zin.disabled = cam.z >= MAP_MAX_ZOOM - .01;
+  mapRt.zout.disabled = !zoomed;
+  document.getElementById('mapViewNational').classList.toggle('on', !zoomed);
+  document.getElementById('mapViewCapital').classList.toggle('on',
+    split && cx > v.x && cx < v.x + v.w && cy > v.y && cy < v.y + v.h);
+}
+/* 라벨 겹침 정리: 선택·우리 학교 → 참여 대학 → 자료 수집 중 순서로 놓고,
+   이미 놓인 점·라벨과 겹치는 라벨은 숨깁니다(더 확대하거나 마우스를 올리면 다시 보임). */
+function layoutMapLabels(v, split) {
+  const dots = [], placed = mapRt.overlays.slice();
+  const over = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+  const shown = mapRt.markers.filter(m => m.shown);
+  shown.forEach(m => {
+    m.sx = (m.x - v.x) * v.s;
+    m.sy = (m.y - v.y) * v.s;
+    dots.push({ m, b:[m.sx - m.r - 1, m.sy - m.r - 1, m.sx + m.r + 1, m.sy + m.r + 1] });
+  });
+  if (!split) {
+    const sx = (CAPITAL_PIN[0] - v.x) * v.s, sy = (CAPITAL_PIN[1] - v.y) * v.s, lw = mapRt.cluster.lw || 72;
+    dots.push({ m:null, b:[sx - 24, sy - 24, sx + 24, sy + 24] });
+    placed.push([sx - lw / 2 - 2, sy - 43, sx + lw / 2 + 2, sy - 28]);
   }
-  svg.appendChild(layer);
+  shown.slice().sort((a, b) => b.pri - a.pri).forEach(m => {
+    const tw = m.tw || mapLabel(m.u).length * 13;
+    const [dx, dy, anchor] = m.off;
+    const x0 = m.sx + dx - (anchor === 'end' ? tw : anchor === 'middle' ? tw / 2 : 0);
+    const box = [x0 - 1, m.sy + dy - 11, x0 + tw + 1, m.sy + dy + 2];
+    const free = !placed.some(b => over(box, b)) && !dots.some(d => d.m !== m && over(box, d.b));
+    m.label.classList.toggle('label-hidden', !free);
+    if (free) placed.push(box);
+  });
 }
 function renderMap() {
   const host = document.getElementById('koreaMap');
   const tpl = document.getElementById('koreaSvgTemplate');
   if (!host) return;
-  host.innerHTML = '';
-  const viewport = document.createElement('div');
-  viewport.className = 'korea-map-viewport';
   const src = tpl ? tpl.content.querySelector('svg') : null;
 
   if (!src) {
     /* SVG 템플릿이 비어 있을 때의 안내 (복원 전 상태) */
-    viewport.innerHTML = '<div class="map-missing"><div><b style="color:var(--ink-strong)">지도 SVG가 아직 삽입되지 않았습니다</b><br>' +
+    host.innerHTML = '<div class="korea-map-viewport"><div class="map-missing"><div><b style="color:var(--ink-strong)">지도 SVG가 아직 삽입되지 않았습니다</b><br>' +
       'index.html 의 &lt;template id="koreaSvgTemplate"&gt; 안에 기존 대한민국 행정경계 SVG를 붙여넣어 주세요.<br>' +
-      '지도를 제외한 모든 기능은 정상 동작합니다.</div></div>';
-    host.appendChild(viewport);
+      '지도를 제외한 모든 기능은 정상 동작합니다.</div></div></div>';
     renderMapPanel();
     return;
   }
+  /* 지도 바탕은 한 번만 만들고, 선택이 바뀔 때는 마커만 다시 그려 확대 상태를 유지합니다 */
+  if (!mapRt.svg || !host.contains(mapRt.svg)) buildMapBase(host, src);
+  buildMapMarkers();
+  measureMap();
+  applyMapCam();
+  renderMapPanel();
+}
+function buildMapBase(host, src) {
+  host.innerHTML = '';
+  const vp = document.createElement('div');
+  vp.className = 'korea-map-viewport';
   const svg = src.cloneNode(true);
-  svg.setAttribute('viewBox', (KOREA_VIEWBOX[state.mapView] || KOREA_VIEWBOX.national).join(' '));
   prepareKoreaSvg(svg);
-  addMapMarkers(svg);
-  viewport.appendChild(svg);
+  vp.appendChild(svg);
 
   const reset = document.createElement('button');
   reset.type = 'button';
-  reset.className = 'map-reset-float' + (state.mapView === 'capital' ? ' show' : '');
+  reset.className = 'map-reset-float';
   reset.textContent = '← 전국 지도로 돌아가기';
   reset.addEventListener('click', () => focusMap('national'));
-  viewport.appendChild(reset);
+  vp.appendChild(reset);
+
+  const zoom = document.createElement('div');
+  zoom.className = 'map-zoom';
+  zoom.innerHTML = '<button type="button" aria-label="지도 확대" title="확대 (마우스 휠을 위로)">+</button>' +
+    '<button type="button" aria-label="지도 축소" title="축소 (마우스 휠을 아래로)">−</button>';
+  const [zin, zout] = zoom.querySelectorAll('button');
+  zin.addEventListener('click', () => zoomMapBy(1.8));
+  zout.addEventListener('click', () => zoomMapBy(1 / 1.8));
+  vp.appendChild(zoom);
 
   const legend = document.createElement('div');
   legend.className = 'korea-map-legend';
@@ -3720,26 +4159,174 @@ function renderMap() {
     '<div class="scale-label"><span>적음</span><span>많음</span></div>' +
     '<div class="dotline"><span class="legend-dot"></span>참여 대학</div>' +
     '<div class="dotline"><span class="legend-dot mine"></span>선택·우리 학교</div>';
-  viewport.appendChild(legend);
+  vp.appendChild(legend);
 
-  host.appendChild(viewport);
-  document.getElementById('mapViewNational').classList.toggle('on', state.mapView === 'national');
-  document.getElementById('mapViewCapital').classList.toggle('on', state.mapView === 'capital');
+  host.appendChild(vp);
+  Object.assign(mapRt, { host, vp, svg, reset, zin, zout, legend, zoomCtl:zoom });
+  bindMapGestures(vp);
+  if (!mapRt.ro && window.ResizeObserver) {
+    mapRt.ro = new ResizeObserver(() => { measureMap(); applyMapCam(); });
+    mapRt.ro.observe(host);
+  }
+  /* 웹폰트가 늦게 로드되면 라벨 폭을 다시 재서 겹침 판정을 맞춥니다 */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measureMapLabels(); measureMap(); applyMapCam(); });
+}
+/* 휠 = 커서 위치 기준 확대·축소, 드래그 = 이동(확대 중), 두 손가락 = 핀치 확대 */
+function bindMapGestures(vp) {
+  const pts = mapRt.pts;
+  vp.addEventListener('wheel', e => {
+    if (!mapRt.w) return;
+    let d = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? mapRt.h : 1);
+    d = Math.max(-150, Math.min(150, d));
+    const c = state.mapCam || nationalCam();
+    /* 전국(가장 축소된) 화면에서 아래로 굴리면 페이지 스크롤을 막지 않습니다 */
+    if (d > 0 && c.z <= 1.001 && !e.ctrlKey) return;
+    e.preventDefault();
+    stopMapAnim();
+    zoomMapAt(e.clientX, e.clientY, c.z * Math.exp(-d * 0.003));
+  }, { passive:false });
+
+  vp.addEventListener('pointerdown', e => {
+    if (!pts.size) mapRt.dragged = false;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.target.closest('button, .korea-map-legend')) return;
+    stopMapAnim();
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    const cam = { ...(state.mapCam || nationalCam()) };
+    if (pts.size === 1) {
+      mapRt.drag = { id:e.pointerId, x:e.clientX, y:e.clientY, cam, moved:false };
+    } else if (pts.size === 2) {
+      mapRt.drag = null;
+      mapRt.dragged = true;
+      mapRt.pinch = { ...pinchInfo(), cam };
+      tipHide();
+    }
+  });
+  vp.addEventListener('pointermove', e => {
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (mapRt.pinch && pts.size >= 2) { pinchZoom(pinchInfo()); return; }
+    const d = mapRt.drag;
+    if (!d || d.id !== e.pointerId) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.moved) {
+      /* 전국 화면은 옮길 곳이 없으므로 드래그를 페이지 스크롤에 양보합니다 */
+      if (d.cam.z <= 1.01 || Math.hypot(dx, dy) < 5) return;
+      d.moved = true;
+      mapRt.dragged = true;
+      vp.classList.add('dragging');
+      tipHide();
+      try { vp.setPointerCapture(e.pointerId); } catch (err) { /* 캡처 불가 환경 무시 */ }
+    }
+    const s = mapRt.fit * d.cam.z;
+    state.mapCam = { cx:d.cam.cx - dx / s, cy:d.cam.cy - dy / s, z:d.cam.z };
+    applyMapCam();
+  });
+  const end = e => {
+    if (!pts.delete(e.pointerId)) return;
+    if (pts.size < 2) mapRt.pinch = null;
+    if (pts.size === 1) {
+      /* 핀치 후 남은 한 손가락으로 이어서 이동 */
+      const [id, p] = [...pts.entries()][0];
+      mapRt.drag = { id, x:p.x, y:p.y, cam:{ ...state.mapCam }, moved:true };
+    } else if (!pts.size) {
+      mapRt.drag = null;
+      vp.classList.remove('dragging');
+    }
+  };
+  vp.addEventListener('pointerup', end);
+  vp.addEventListener('pointercancel', end);
+  vp.addEventListener('pointerleave', e => { if (!vp.hasPointerCapture(e.pointerId)) end(e); });
+  /* 드래그·핀치 직후 발생하는 click 은 마커 선택으로 처리하지 않습니다 */
+  vp.addEventListener('click', e => {
+    if (!mapRt.dragged || e.target.closest('button')) return;
+    mapRt.dragged = false;
+    e.stopPropagation();
+    e.preventDefault();
+  }, true);
+  /* 키보드: + / - 로 확대·축소, 확대 중에는 방향키로 이동 */
+  vp.addEventListener('keydown', e => {
+    const c = state.mapCam || nationalCam();
+    const step = 80 / (mapRt.fit * c.z);
+    const act = { '+':[0, 0, 1.5], '=':[0, 0, 1.5], '-':[0, 0, 1 / 1.5], '_':[0, 0, 1 / 1.5],
+      ArrowLeft:[-step, 0, 1], ArrowRight:[step, 0, 1], ArrowUp:[0, -step, 1], ArrowDown:[0, step, 1] }[e.key];
+    if (!act || (act[2] === 1 && c.z <= 1.01)) return;
+    e.preventDefault();
+    animateMapCam({ cx:c.cx + act[0], cy:c.cy + act[1], z:c.z * act[2] }, 220);
+  });
+}
+function pinchInfo() {
+  const [a, b] = [...mapRt.pts.values()];
+  return { d:Math.hypot(a.x - b.x, a.y - b.y) || 1, x:(a.x + b.x) / 2, y:(a.y + b.y) / 2 };
+}
+/* 두 손가락 가운데 지점을 붙잡은 채로 확대·이동 */
+function pinchZoom(p) {
+  const st = mapRt.pinch, r = mapRt.vp.getBoundingClientRect(), v = camView(st.cam);
+  const mx = v.x + (st.x - r.left) / v.s, my = v.y + (st.y - r.top) / v.s;
+  const z = Math.min(MAP_MAX_ZOOM, Math.max(1, st.cam.z * p.d / st.d)), s = mapRt.fit * z;
+  state.mapCam = { cx:mx + (mapRt.w / 2 - (p.x - r.left)) / s, cy:my + (mapRt.h / 2 - (p.y - r.top)) / s, z };
+  applyMapCam();
+}
+/* 커서 아래 지점을 고정한 채로 확대·축소 */
+function zoomMapAt(clientX, clientY, z) {
+  const r = mapRt.vp.getBoundingClientRect(), v = camView(state.mapCam || nationalCam());
+  const px = clientX - r.left, py = clientY - r.top;
+  const nz = Math.min(MAP_MAX_ZOOM, Math.max(1, z)), s = mapRt.fit * nz;
+  state.mapCam = { cx:v.x + px / v.s + (mapRt.w / 2 - px) / s, cy:v.y + py / v.s + (mapRt.h / 2 - py) / s, z:nz };
+  applyMapCam();
+}
+function zoomMapBy(f) {
+  const c = state.mapCam || nationalCam();
+  animateMapCam({ cx:c.cx, cy:c.cy, z:c.z * f }, 260);
+}
+function stopMapAnim() {
+  if (mapRt.anim) cancelAnimationFrame(mapRt.anim);
+  mapRt.anim = 0;
+}
+function animateMapCam(target, dur) {
+  stopMapAnim();
+  if (!mapRt.w) return;
+  const from = clampCam(state.mapCam || nationalCam()), to = clampCam(target);
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { state.mapCam = to; applyMapCam(); return; }
+  const t0 = performance.now(), T = dur || 520, lz0 = Math.log(from.z), lz1 = Math.log(to.z);
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = now => {
+    const t = Math.min(1, (now - t0) / T), q = ease(t);
+    state.mapCam = { cx:from.cx + (to.cx - from.cx) * q, cy:from.cy + (to.cy - from.cy) * q, z:Math.exp(lz0 + (lz1 - lz0) * q) };
+    applyMapCam();
+    mapRt.anim = t < 1 ? requestAnimationFrame(step) : 0;
+  };
+  mapRt.anim = requestAnimationFrame(step);
+}
+function focusMap(area) {
+  if (!mapRt.w) return;
+  animateMapCam(area === 'capital' ? capitalCam() : nationalCam());
+}
+function refreshMapMarkers() {
+  if (!mapRt.svg) { renderMap(); return; }
+  buildMapMarkers();
+  applyMapCam();
   renderMapPanel();
 }
-function focusMap(area) { state.mapView = area === 'capital' ? 'capital' : 'national'; renderMap(); }
-function selectOnMap(id) {
+function selectOnMap(id, refocus) {
   state.mapSel = id;
   const u = byId(id);
-  if (u && isCapital(u) && state.mapView !== 'capital') state.mapView = 'capital';
-  renderMap();
+  refreshMapMarkers();
+  /* 키보드로 고른 경우, 다시 그려진 같은 마커로 포커스를 돌려줍니다 */
+  const m = refocus && mapRt.markers.find(x => x.u.id === id);
+  if (m) m.el.focus({ preventScroll:true });
+  if (u && isCapital(u) && mapRt.w && camView(state.mapCam || nationalCam()).s < CAPITAL_SPLIT_PX) focusMap('capital');
 }
 function focusSchoolOnMap(id) {
   const u = byId(id);
   if (!u) return;
   state.mapSel = id;
-  state.mapView = isCapital(u) ? 'capital' : 'national';
-  renderMap();
+  refreshMapMarkers();
+  const p = MAP_POS[u.id];
+  if (p && mapRt.w) {
+    const cur = (state.mapCam || nationalCam()).z;
+    animateMapCam({ cx:p[0], cy:p[1], z:Math.max(cur, isCapital(u) ? capitalCam().z : 2.5) });
+  }
   document.getElementById('koreaMap').scrollIntoView({ behavior:'smooth', block:'center' });
 }
 function renderMapPanel() {
@@ -3750,7 +4337,7 @@ function renderMapPanel() {
     p.innerHTML = '<div class="mp-in" style="text-align:center"><div style="font-size:26px;margin-bottom:8px">🗺️</div>' +
       '<b style="color:var(--accent)">지도에서 대학을 선택해 주세요</b>' +
       '<div class="muted" style="margin-top:8px;line-height:1.7">시·도 색이 진할수록 해당 권역 대학의 탄소배출 총량이 많습니다.<br>' +
-      '수도권 묶음을 누르면 대학별 위치가 확대됩니다.</div></div>';
+      '휠이나 + 버튼으로 확대하면 수도권 대학이 하나씩 펼쳐집니다.</div></div>';
     return;
   }
   if (u.status === 'pending') {
@@ -3925,6 +4512,33 @@ function initSatelliteScene() {
   if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(scene);
   else window.addEventListener('resize', onResize);
 }
+
+/* ============================================================
+   플랫폼 소개 (kuce-platform-intro.html 이식)
+   - 플랫폼명이 확정되면 PLATFORM_NAME 한 줄만 바꾸면 본문·탭 제목에 반영됩니다.
+============================================================ */
+const PLATFORM_NAME = '[플랫폼명]';
+(function applyPlatformName() {
+  const named = PLATFORM_NAME !== '[플랫폼명]';
+  document.querySelectorAll('.platform-name').forEach(el => {
+    el.textContent = PLATFORM_NAME;
+    if (named) el.classList.remove('pf-tbd');
+  });
+  if (named) TITLES.platform = PLATFORM_NAME + ' 소개 | KUCE';
+})();
+/* 스크롤 진입 페이드인 — 한 번 보이면 관찰을 해제합니다(모션 최소화 설정은 CSS에서 무효화) */
+(function revealPlatformSections() {
+  const targets = document.querySelectorAll('#page-platform .pf-reveal');
+  if (!('IntersectionObserver' in window)) { targets.forEach(el => el.classList.add('is-in')); return; }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-in');
+      io.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  targets.forEach(el => io.observe(el));
+})();
 
 /* ============================================================
    레이아웃 보정 · 이벤트 연결 · 초기화
