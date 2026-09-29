@@ -572,8 +572,10 @@ section.timeline{margin-top:36px}
 .rankrow:hover{background:var(--accent-soft)}
 .rankrow .pick{display:grid;place-items:center;min-height:44px}
 .rankrow .pick input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+.rankcell{display:flex;align-items:center}
+/* 숫자 글리프가 아래로 치우치는 Noto Sans KR 특성을 보정해 로고 중심과 세로 정렬 */
 .rankbadge{
-  display:inline-grid;place-items:center;min-width:30px;height:24px;padding:0 7px;border-radius:8px;
+  display:inline-grid;place-items:center;min-width:30px;height:24px;padding:0 7px 2px;border-radius:8px;line-height:1;
   font-size:12px;font-weight:900;color:#fff;background:var(--rankrest);
 }
 .rankbadge.r1{background:var(--rank1)}
@@ -3231,7 +3233,7 @@ function renderHomeTop5() {
     ], sourceLine('carbon'));
     return '<div class="rankrow" role="button" tabindex="0" data-tip="' + attr(tip) + '" onclick="openDetail(\'' + r.u.id +
       '\')" onkeydown="if(event.key===\'Enter\'){openDetail(\'' + r.u.id + '\')}">' +
-      '<div><span class="rankbadge ' + rankClass(i, 'r') + '">' + (i + 1) + '</span></div>' +
+      '<div class="rankcell"><span class="rankbadge ' + rankClass(i, 'r') + '">' + (i + 1) + '</span></div>' +
       '<div class="name with-logo" title="' + attr(r.u.name) + '">' + logoHTML(r.u) + '<span class="nm">' + esc(r.u.name) + '</span></div>' +
       '<div class="val">' + fmt(Math.round(r.v)) + '<small>tCO₂e</small></div></div>';
   }).join('');
@@ -3246,7 +3248,7 @@ function renderHomeTop5() {
     ], sourceLine('carbon'));
     return '<div class="rankrow" role="button" tabindex="0" data-tip="' + attr(tip) + '" onclick="openDetail(\'' + r.u.id +
       '\')" onkeydown="if(event.key===\'Enter\'){openDetail(\'' + r.u.id + '\')}">' +
-      '<div><span class="rankbadge ' + rankClass(i, 'g') + '">' + (i + 1) + '</span></div>' +
+      '<div class="rankcell"><span class="rankbadge ' + rankClass(i, 'g') + '">' + (i + 1) + '</span></div>' +
       '<div class="name with-logo" title="' + attr(r.u.name) + '">' + logoHTML(r.u) + '<span class="nm">' + esc(r.u.name) + '</span></div>' +
       '<div class="val">' + deltaHTML(r.v) + '</div></div>';
   }).join('');
@@ -3388,7 +3390,7 @@ function renderRankList(rows) {
       '" role="button" tabindex="0" data-tip="' + attr(tip) + '">' +
       '<label class="pick" onclick="event.stopPropagation()"><input type="checkbox" ' + (picked ? 'checked' : '') +
       ' aria-label="' + attr(u.name + ' 비교 선택') + '" onchange="toggleSelect(\'' + u.id + '\')"></label>' +
-      '<div><span class="rankbadge ' + rc + '">' + (i + 1) + '</span></div>' +
+      '<div class="rankcell"><span class="rankbadge ' + rc + '">' + (i + 1) + '</span></div>' +
       '<div class="name with-logo" title="' + attr(u.name) + '">' + logoHTML(u, 'md') + '<span class="nm">' + esc(u.name) +
       '<small>' + esc(u.region + ' · ' + schemeName(u.scheme)) + '</small></span></div>' +
       '<div class="barcell"><div class="barfill ' + rc + '" style="width:0%" data-w="' + (r.v / max * 100).toFixed(1) + '"></div></div>' +
