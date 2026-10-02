@@ -269,6 +269,36 @@ svg{display:block}
   display:inline-block;margin-left:4px;padding:3px 11px;border-radius:999px;
   background:var(--accent-soft);color:var(--accent);font-weight:900;font-size:12.5px;
 }
+/* ---------- '미제공!' 낙인 · 데이터 확인 표시 ---------- */
+.stamp{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 8px 1px;margin-left:6px;
+  border:2px solid #B91C1C;border-radius:4px;outline:1px solid #B91C1C;outline-offset:2px;
+  color:#B91C1C;background:#FFF5F5;font-size:11px;font-weight:900;letter-spacing:.06em;
+  line-height:1.45;transform:rotate(-6deg);white-space:nowrap;vertical-align:middle;cursor:help;
+  font-family:inherit;
+}
+.stamp.lg{font-size:16px;padding:4px 12px 3px;border-width:3px;outline-width:2px;outline-offset:3px;transform:rotate(-5deg)}
+.stamp-banner{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:14px 0 4px;padding:14px 18px;
+  border:1px dashed #E7A3A3;border-radius:12px;background:#FEF6F6;color:#7F1D1D;font-size:13.5px;line-height:1.6;
+}
+.flag-chip{
+  display:inline-flex;align-items:center;gap:4px;padding:1px 8px;margin-left:6px;border-radius:999px;
+  background:var(--mine-soft);color:var(--mine);border:1px solid var(--mine-line);
+  font-size:11px;font-weight:800;white-space:nowrap;vertical-align:middle;cursor:help;
+}
+.data-note{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--surface-2);font-size:13px;line-height:1.7;color:var(--ink-soft)}
+.data-note b{color:var(--ink-strong)}
+.branch-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.branch-table th,.branch-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+.branch-table th:first-child,.branch-table td:first-child{text-align:left}
+.branch-table th{color:var(--ink-soft);font-weight:700}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .stamp{color:#F87171;border-color:#F87171;outline-color:#F87171;background:rgba(248,113,113,.08)}
+  :root:not([data-theme="light"]) .stamp-banner{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.4);color:#FCA5A5}
+}
+:root[data-theme="dark"] .stamp{color:#F87171;border-color:#F87171;outline-color:#F87171;background:rgba(248,113,113,.08)}
+:root[data-theme="dark"] .stamp-banner{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.4);color:#FCA5A5}
 .sample-badge{
   display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;
   background:var(--up-soft);color:var(--up);font-size:11.5px;font-weight:900;
@@ -386,6 +416,14 @@ svg{display:block}
 .name.with-logo{display:flex;align-items:center;gap:9px}
 .name.with-logo .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rankrow.mine .name.with-logo::after{flex:0 0 auto}
+.name-flags{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px;flex:0 0 auto}
+.name-flags:empty{display:none}
+.name-flags .stamp,.name-flags .flag-chip{margin-left:0}
+@media (max-width:640px){
+  .rankrow .name.with-logo{flex-wrap:wrap;row-gap:3px}
+  .rankrow .name.with-logo .nm{flex:1 1 0}
+  .rankrow .name-flags{flex-basis:100%;order:3;padding:2px 0 2px 2px}
+}
 .u-title{display:flex;align-items:center;gap:12px}
 
 /* ---------- 홈: 전국 요약 카드 ---------- */
@@ -1567,7 +1605,7 @@ section.timeline{margin-top:36px}
     <span class="muted">수치가 큰 값부터 작은 값 순으로 표시됩니다. 순위 번호는 맨 위가 1위이며, 행을 클릭하면 학교 상세 페이지로 이동합니다. 왼쪽 체크박스로 최대 6개 학교를 골라 비교할 수 있습니다.</span>
     <span class="muted" id="rankUnit"></span>
   </div>
-  <div class="muted" id="perAreaNote" style="margin-top:8px;display:none">※ 면적당 지표는 캠퍼스 특성(부속시설·병원 등 연면적 구성)에 따라 왜곡될 수 있으므로 참고용으로 활용해 주세요.</div>
+  <div class="muted" id="perAreaNote" style="margin-top:8px;display:none">※ 면적당 지표는 교지(캠퍼스 부지) 면적 기준이라 캠퍼스 특성에 따라 왜곡될 수 있으므로 참고용으로 활용해 주세요.</div>
   <div class="muted" id="compareSource" style="margin-top:10px"></div>
 </main>
 
@@ -2479,110 +2517,166 @@ section.timeline{margin-top:36px}
          화면·계산 로직은 손대지 않아도 됩니다.
 ============================================================ */
 const CONFIG = {
-  /* 실데이터로 교체하면 false 로 바꾸세요. 샘플 안내 문구가 한 번에 사라집니다. */
-  IS_SAMPLE_DATA: true,
+  /* 실데이터 적용 완료(2026.10). 샘플 안내 문구는 표시되지 않습니다. */
+  IS_SAMPLE_DATA: false,
   SITE_URL: 'https://universities-carbon-energy.vercel.app',
-  UPDATED: '2026.07',
+  UPDATED: '2026.10',
   SOURCE: {
-    ghg: '온실가스종합정보센터(배출권거래제·목표관리제 명세서)',
-    ghgShort: '온실가스종합정보센터',
+    ghg: '온실가스종합정보센터(GIR, 명세서 배출량 통계)·환경정보공개시스템·NGMS',
+    ghgShort: '온실가스종합정보센터·환경정보공개시스템·NGMS',
     ghgYear: 2024,
-    alimi: '대학알리미(재학생·전임교원·직원 수, 연면적)',
-    alimiShort: '대학알리미',
+    alimi: '교육통계서비스(인구수)·대학알리미(교지면적)·배출권시장정보플랫폼(사전할당량)',
+    alimiShort: '교육통계서비스·대학알리미',
     alimiYear: 2024
   },
+  /* 학교별 출처가 비어 있을 때 표시할 문구 */
+  SOURCE_UNCONFIRMED: '출처 확인 중',
+  /* 탄소배출량이 공개 자료에서 확인되지 않은 연도 표시 */
+  MISSING_LABEL: '미제공!',
+  MISSING_DESC: '공개 자료(온실가스종합정보센터 명세서 등)에서 해당 연도 탄소배출량이 확인되지 않았습니다.',
+  /* 자료 기준이 달라 데이터팀이 일부러 뺀 연도 표시(낙인 아님) */
+  EXCLUDED_LABEL: '제외',
   MAX_COMPARE: 6
 };
 
-const YEARS = [2021, 2022, 2023, 2024, 2025, 2026];
+const YEARS = [2021, 2022, 2023, 2024];
 const LAST = YEARS.length - 1;
 
-/* 샘플 시계열 생성기 — 실데이터 적용 시 배열을 그대로 넣으면 됩니다. */
-const wig = [0, 0.004, -0.003, 0.002, -0.002, 0.001];
-const gen = (v0, r) => YEARS.map((_, i) => Math.round(v0 * Math.pow(1 - r, i) * (1 + wig[i])));
-
 /* ------------------------------------------------------------
-   대학 목록 (총 24개 기관)
-   - name  : 화면에 표시되는 학교명  ← 법인명 대신 학교명을 노출합니다
-   - legal : 법인명(상세 페이지 보조 정보로만 노출)
-   - status: 'active' 실데이터/샘플 보유, 'pending' 자료 수집 중
-   - campuses: 수치에 포함된 캠퍼스 범위
+   대학 목록 (총 24개 기관) — 2026 데이터팀 수집 엑셀(대학별 24개 파일) 기준
+   - name    : 화면에 표시되는 학교명
+   - legal   : 법인명 (엑셀 '법인명' 칸)
+   - scheme  : 'ETS' 배출권거래제 / 'TMS' 건물부문 목표관리제 (2026 NOTICE 기준)
+   - campuses: 탄소배출량에 포함된 캠퍼스 범위
+   - carbon  : 연도별 탄소배출량(tCO₂e). null = 공개 자료에서 확인되지 않음 → '미제공!' 표시
+   - energy  : 연도별 에너지사용량(TJ). null = 데이터 없음
+   - members : 인구수(명, 2024, 교육통계서비스) — 탄소배출량과 같은 캠퍼스 범위
+   - gfa     : 교지면적(㎡, 2024, 대학알리미)
+   - baseline: 사전할당량(tCO₂e, 2024, 배출권거래제 대상만)
+   - branches: 본교 순위에 넣지 않고 따로 보여 주는 분캠 탄소배출량
+   - source  : 탄소배출량 출처 / energySource: 에너지사용량 출처 (엑셀 3행·4행·메모 기준)
+               null 이면 CONFIG.SOURCE_UNCONFIRMED('출처 확인 중')로 표시
+   - excluded: { 연도: 사유 } — 기준이 달라 뺀 연도. '미제공!' 대신 회색 '제외'로 표시
+   - notes   : 상세 페이지에 노출하는 데이터 유의사항
+   - energyFlag: 에너지 값 범위·단위 재확인이 필요한 학교
 ------------------------------------------------------------ */
+const GHG = '온실가스종합정보센터(GIR)';
+const ENV = '환경정보공개시스템';
+const NGMS = 'NGMS(공공부문 목표관리)';
 const UNIVERSITIES = [
-  { id:'kangwon', name:'강원대학교', legal:'국립 강원대학교', region:'강원권', scheme:'TMS',
-    campuses:['춘천캠퍼스','삼척캠퍼스'], members:24300, gfa:1050000, baseline:39000, credit:72,
-    carbon:gen(40300,0.022), energy:gen(795,0.021), status:'active' },
-  { id:'knu', name:'경북대학교', legal:'국립 경북대학교', region:'영남권', scheme:'TMS',
-    campuses:['대구캠퍼스','상주캠퍼스'], members:27800, gfa:1180000, baseline:61000, credit:120,
-    carbon:gen(63100,0.021), energy:gen(1247,0.020), status:'active' },
-  { id:'gnu', name:'경상국립대학교', legal:'국립 경상국립대학교', region:'영남권', scheme:'TMS',
-    campuses:['가좌캠퍼스','칠암캠퍼스','통영캠퍼스'], members:21500, gfa:980000, baseline:36000, credit:60,
-    carbon:gen(37200,0.020), energy:gen(735,0.019), status:'active' },
+  { id:'kangwon', name:'강원대학교', legal:null, region:'강원권', scheme:'TMS',
+    campuses:['전 캠퍼스 합산'], members:27711, gfa:1001311, baseline:null, credit:null, source:GHG, energySource:GHG,
+    carbon:[17812, 18864, 18769, 19897], energy:[368, 389, 387, 411],
+    notes:['건물부문 (2021–2024)'], status:'active' },
+  { id:'knu', name:'경북대학교', legal:'경북대학교', region:'영남권', scheme:'ETS',
+    campuses:['제1캠퍼스(본교)'], members:29591, gfa:1358896, baseline:33550, credit:null, source:ENV, energySource:GHG,
+    carbon:[26285, 27808, 28384, 31480], energy:[737, 788, 855, 864],
+    branches:[{ name:'제2캠퍼스', carbon:[3192, 3381, 3359, 3378] }, { name:'제3캠퍼스', carbon:[2740, 2718, 2622, 2626] }],
+    notes:['탄소배출량은 본교(제1캠퍼스) 값이며, 제2·제3캠퍼스는 따로 표시합니다.',
+           '에너지사용량은 캠퍼스 구분이 없어 전 캠퍼스 합계로 보입니다.'], status:'active' },
+  { id:'gnu', name:'경상국립대학교', legal:'경상국립대학교', region:'영남권', scheme:'TMS',
+    campuses:['전 캠퍼스 합산'], members:24181, gfa:1762360, baseline:null, credit:null, source:NGMS, energySource:GHG,
+    carbon:[20012, 21719, 22348, 23680], energy:[null, null, 405, 433],
+    notes:['건물부문', '에너지사용량은 2023년부터 데이터가 있습니다.'], status:'active' },
   { id:'snu', name:'서울대학교', legal:'국립대학법인 서울대학교', region:'수도권', scheme:'ETS',
-    campuses:['관악캠퍼스','연건캠퍼스'], members:34500, gfa:1620000, baseline:118000, credit:420,
-    carbon:gen(121000,0.023), energy:gen(2380,0.022), status:'active' },
-  { id:'pnu', name:'부산대학교', legal:'국립 부산대학교', region:'영남권', scheme:'TMS',
-    campuses:['부산캠퍼스','밀양캠퍼스','양산캠퍼스'], members:28900, gfa:1230000, baseline:66000, credit:150,
-    carbon:gen(68200,0.021), energy:gen(1347,0.020), status:'active' },
-  { id:'jnu', name:'전남대학교', legal:'국립 전남대학교', region:'호남권', scheme:'TMS',
-    campuses:['광주캠퍼스','여수캠퍼스'], members:24600, gfa:1090000, baseline:52000, credit:95,
-    carbon:gen(53800,0.020), energy:gen(1063,0.019), status:'active' },
-  { id:'jbnu', name:'전북대학교', legal:'국립 전북대학교', region:'호남권', scheme:'TMS',
-    campuses:['전주캠퍼스','익산캠퍼스'], members:23200, gfa:1020000, baseline:47000, credit:85,
-    carbon:gen(48600,0.019), energy:gen(960,0.019), status:'active' },
-  { id:'cnu', name:'충남대학교', legal:'국립 충남대학교', region:'충청권', scheme:'TMS',
-    campuses:['대덕캠퍼스','보운캠퍼스'], members:22400, gfa:990000, baseline:45500, credit:80,
-    carbon:gen(47100,0.020), energy:gen(930,0.019), status:'active' },
-  { id:'cbnu', name:'충북대학교', legal:'국립 충북대학교', region:'충청권', scheme:'TMS',
-    campuses:['개신캠퍼스'], members:18700, gfa:830000, baseline:37000, credit:65,
-    carbon:gen(38300,0.019), energy:gen(757,0.018), status:'active' },
-  { id:'konkuk', name:'건국대학교', legal:'학교법인 건국대학교', region:'수도권', scheme:'TMS',
-    campuses:['서울캠퍼스'], members:23900, gfa:880000, baseline:52000, credit:98,
-    carbon:gen(53900,0.020), energy:gen(1065,0.019), status:'active' },
+    campuses:['전 캠퍼스 합산'], members:49088, gfa:6208557, baseline:135503, credit:null, source:GHG, energySource:GHG,
+    carbon:[141334, 144448, 146334, 150776], energy:[2905, 2991, 3014, 3108],
+    notes:[], status:'active' },
+  { id:'pnu', name:'부산대학교', legal:'부산대학교', region:'영남권', scheme:'TMS',
+    campuses:['전 캠퍼스 합산'], members:36991, gfa:1266245, baseline:null, credit:null, source:GHG, energySource:GHG,
+    carbon:[24381, 25945, 27134, 28575], energy:[508, 550, 638, 648],
+    notes:['건물부문 (2021–2024)'], status:'active' },
+  { id:'jnu', name:'전남대학교', legal:'전남대학교', region:'호남권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:30728, gfa:1116128, baseline:34702, credit:null, source:GHG, energySource:GHG,
+    carbon:[35308, 37185, 36057, 37811], energy:[717, 757, 729, 769],
+    notes:['건물부문(2021) / 이후 고등교육기관'], status:'active' },
+  { id:'jbnu', name:'전북대학교', legal:'전북대학교', region:'호남권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:27619, gfa:1428304, baseline:29224, credit:null, source:GHG, energySource:GHG,
+    carbon:[33225, 35240, 35859, 35713], energy:[694, 740, 739, 735],
+    notes:[], status:'active' },
+  { id:'cnu', name:'충남대학교', legal:'충남대학교', region:'충청권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:29126, gfa:1681876, baseline:28553, credit:null, source:GHG, energySource:GHG,
+    carbon:[27327, 29643, 29751, 30486], energy:[561, 609, 616, 631],
+    notes:['고등교육기관 (건물 중 고등교육기관 부문 선택)'], status:'active' },
+  { id:'cbnu', name:'충북대학교', legal:'충북대학교', region:'충청권', scheme:'TMS',
+    campuses:['전 캠퍼스 합산'], members:21320, gfa:2540656, baseline:null, credit:null, source:GHG, energySource:GHG,
+    carbon:[17841, 20392, 20829, 20700], energy:[346, 398, 406, 419],
+    notes:[], status:'active' },
+  { id:'konkuk', name:'건국대학교', legal:'학교법인 건국대학교', region:'수도권', scheme:'ETS',
+    campuses:['서울캠퍼스'], members:26381, gfa:449273, baseline:26764, credit:null, source:ENV, energySource:GHG,
+    carbon:[null, 25358, 22237, 25133], energy:[1464, 1534, 1457, 1526],
+    branches:[{ name:'글로컬캠퍼스(분교)', carbon:[null, 5424, 5430, 5564] }],
+    carbonNote:'서울캠퍼스만 측정한 값',
+    notes:['탄소배출량은 서울캠퍼스만 측정한 값입니다. 분교는 따로 표시합니다.',
+           '2021 법인명 건국대학교, 지정업종 건물 / 2022–2024 지정업종 고등교육기관'],
+    energyFlag:'에너지사용량이 탄소배출량에 비해 2배 이상 크게 나타나 범위·단위 확인이 필요합니다(캠퍼스 구분 없음).',
+    status:'active' },
   { id:'khu', name:'경희대학교', legal:'학교법인 경희학원', region:'수도권', scheme:'TMS',
-    campuses:['서울캠퍼스','국제캠퍼스'], members:26700, gfa:920000, baseline:62000, credit:118,
-    carbon:gen(64100,0.021), energy:gen(1266,0.020), status:'active' },
+    campuses:['전 캠퍼스 합산'], members:49518, gfa:1689441, baseline:null, credit:null, source:GHG, energySource:GHG,
+    carbon:[55162, 58372, 60346, 60644], energy:[1131, 1202, 1240, 1249],
+    notes:['건물부문'], status:'active' },
   { id:'keimyung', name:'계명대학교', legal:'학교법인 계명대학교', region:'영남권', scheme:'TMS',
-    campuses:['성서캠퍼스','대명캠퍼스'], members:18200, gfa:790000, baseline:48000, credit:88,
-    carbon:gen(49700,0.019), energy:gen(982,0.018), status:'active' },
+    campuses:['전 캠퍼스 합산'], members:25981, gfa:1819363, baseline:null, credit:null, source:GHG, energySource:GHG,
+    carbon:[null, 20634, 21292, 21117], energy:[null, 416, 434, 437],
+    excluded:{ 2021:'2021년 자료는 학교법인이 아닌 계명대학교 동산의료원 기준이라 탄소배출량·에너지사용량 모두 제외했습니다.' },
+    notes:['건물부문 (2022–2024)'], status:'active' },
   { id:'korea', name:'고려대학교', legal:'학교법인 고려중앙학원', region:'수도권', scheme:'ETS',
-    campuses:['서울캠퍼스','세종캠퍼스'], members:30100, gfa:1240000, baseline:120000, credit:405,
-    carbon:gen(123800,0.022), energy:gen(2446,0.021), status:'active' },
-  { id:'skku', name:'성균관대학교', legal:'학교법인 성균관대학', region:'수도권', scheme:'TMS',
-    campuses:['인문사회과학캠퍼스','자연과학캠퍼스'], members:26200, gfa:1010000, baseline:74000, credit:135,
-    carbon:gen(75800,0.021), energy:gen(1497,0.020), status:'active' },
+    campuses:['전 캠퍼스 합산'], members:56153, gfa:946225, baseline:97180, credit:null, source:GHG, energySource:GHG,
+    carbon:[101769, 106939, 108831, 111736], energy:[2090, 2207, 2241, 2302],
+    notes:[], status:'active' },
+  { id:'skku', name:'성균관대학교', legal:'학교법인 성균관대학', region:'수도권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:42717, gfa:634007, baseline:38476, credit:null, source:GHG, energySource:null,
+    carbon:[62402, 66084, 69922, 70474], energy:[1272, 1361, 1410, 1428],
+    notes:['건물부문(2021) / 이후 고등교육기관'], status:'active' },
   { id:'yonsei', name:'연세대학교', legal:'학교법인 연세대학교', region:'수도권', scheme:'ETS',
-    campuses:['신촌캠퍼스','국제캠퍼스','미래캠퍼스'], members:31400, gfa:1350000, baseline:150000, credit:520,
-    carbon:gen(154600,0.023), energy:gen(3054,0.022), status:'active' },
+    campuses:['신촌캠퍼스','국제캠퍼스'], members:52838, gfa:1595587, baseline:164941, credit:null, source:GHG, energySource:GHG,
+    carbon:[178114, 193941, 201772, 203451], energy:[3674, 4017, 4174, 4207],
+    notes:['본교(신촌캠퍼스+국제캠퍼스) 기준으로 산정했습니다. 인구수에서 분교(미래캠퍼스)는 제외했습니다.'], status:'active' },
   { id:'yu', name:'영남대학교', legal:'학교법인 영남학원', region:'영남권', scheme:'TMS',
-    campuses:['경산캠퍼스','대구캠퍼스'], members:20400, gfa:900000, baseline:46000, credit:82,
-    carbon:gen(47600,0.019), energy:gen(940,0.018), status:'active' },
-  { id:'ewha', name:'이화여자대학교', legal:'학교법인 이화학당', region:'수도권', scheme:'TMS',
-    campuses:['서울캠퍼스'], members:18600, gfa:700000, baseline:45000, credit:78,
-    carbon:gen(46300,0.020), energy:gen(915,0.019), status:'active' },
+    campuses:['전 캠퍼스 합산'], members:27428, gfa:2689463, baseline:null, credit:null, source:ENV, energySource:GHG,
+    carbon:[14768, 15810, 15484, 16321], energy:[null, 326, 633, 645],
+    notes:['건물부문', '2021년 에너지사용량 자료 없음'],
+    energyFlag:'2023년 에너지사용량이 전년의 약 2배로 늘었지만 탄소배출량은 비슷해 확인이 필요합니다.',
+    status:'active' },
+  { id:'ewha', name:'이화여자대학교', legal:'학교법인 이화학당', region:'수도권', scheme:'ETS',
+    campuses:['본교'], members:31804, gfa:557585, baseline:32850, credit:null, source:ENV, energySource:GHG,
+    carbon:[null, 32544, 33199, 34210], energy:[1416, 1514, 3105, 3285],
+    branches:[{ name:'의과대학', carbon:[null, 2864, 2702, 2555] }],
+    notes:['탄소배출량은 본교 값이며, 의과대학은 따로 표시합니다.'],
+    energyFlag:'2023년 에너지사용량이 전년의 약 2배로 늘었지만 탄소배출량은 비슷해 확인이 필요합니다(캠퍼스 구분 없음).',
+    status:'active' },
   { id:'cau', name:'중앙대학교', legal:'학교법인 중앙대학교', region:'수도권', scheme:'TMS',
-    campuses:['서울캠퍼스','다빈치캠퍼스'], members:22800, gfa:850000, baseline:60000, credit:112,
-    carbon:gen(62000,0.021), energy:gen(1225,0.020), status:'active' },
-  { id:'postech', name:'포항공과대학교', legal:'학교법인 포항공과대학교', region:'영남권', scheme:'ETS',
-    campuses:['포항캠퍼스'], members:5400, gfa:450000, baseline:41000, credit:130,
-    carbon:gen(42600,0.020), energy:gen(842,0.019), status:'active' },
-  { id:'hanyang', name:'한양대학교', legal:'학교법인 한양학원', region:'수도권', scheme:'TMS',
-    campuses:['서울캠퍼스','ERICA캠퍼스'], members:27300, gfa:950000, baseline:71000, credit:128,
-    carbon:gen(73400,0.021), energy:gen(1450,0.020), status:'active' },
-
-  /* ---- 자료 수집 중(랭킹·그래프에서 제외되고 목록에만 표시됩니다) ---- */
-  { id:'kaist', name:'한국과학기술원(KAIST)', legal:'한국과학기술원', region:'충청권', scheme:null,
-    campuses:['대전 본원'], members:null, gfa:null, baseline:null, credit:null,
-    carbon:null, energy:null, status:'pending' },
-  { id:'gist', name:'광주과학기술원(GIST)', legal:'광주과학기술원', region:'호남권', scheme:null,
-    campuses:['광주 본원'], members:null, gfa:null, baseline:null, credit:null,
-    carbon:null, energy:null, status:'pending' },
-  { id:'dgist', name:'대구경북과학기술원(DGIST)', legal:'대구경북과학기술원', region:'영남권', scheme:null,
-    campuses:['대구 본원'], members:null, gfa:null, baseline:null, credit:null,
-    carbon:null, energy:null, status:'pending' },
-  { id:'unist', name:'울산과학기술원(UNIST)', legal:'울산과학기술원', region:'영남권', scheme:null,
-    campuses:['울산 본원'], members:null, gfa:null, baseline:null, credit:null,
-    carbon:null, energy:null, status:'pending' }
+    campuses:['전 캠퍼스 합산'], members:39913, gfa:149885, baseline:null, credit:null, source:GHG, energySource:GHG,
+    carbon:[null, 19989, 20141, 20621], energy:[365, 411, 415, 425],
+    notes:['건물부문 (2021–2024)'], status:'active' },
+  { id:'postech', name:'포항공과대학교', legal:'학교법인 포항공과대학', region:'영남권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:6223, gfa:1621167, baseline:73002, credit:null, source:ENV, energySource:GHG,
+    carbon:[76966, 81219, 75808, 82100], energy:[1730, 1848, 1733, 1855],
+    notes:[], status:'active' },
+  { id:'hanyang', name:'한양대학교', legal:'학교법인 한양학원', region:'수도권', scheme:'ETS',
+    campuses:['서울캠퍼스'], members:38777, gfa:383576, baseline:73872, credit:null, source:ENV, energySource:null,
+    carbon:[31033, 32664, 34071, 34831], energy:[1494, 1578, 1613, 3199],
+    branches:[{ name:'ERICA캠퍼스(분교)', carbon:[16415, 18108, 18693, 19372] }],
+    notes:['탄소배출량은 서울캠퍼스 값이며, ERICA캠퍼스는 따로 표시합니다.',
+           '2021 지정업종 건물 / 2022–2024 지정업종 고등교육기관'],
+    energyFlag:'2024년 에너지사용량이 전년의 약 2배로 늘어 캠퍼스 범위 확인이 필요합니다(캠퍼스 구분 없음).',
+    status:'active' },
+  { id:'kaist', name:'한국과학기술원(KAIST)', legal:'한국과학기술원', region:'충청권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:22759, gfa:1540948, baseline:73989, credit:null, source:GHG, energySource:GHG,
+    carbon:[80675, 84289, 85412, 87144], energy:[1632, 1722, 1723, 1785],
+    notes:['2021 지정업종 건물 / 2022–2024 지정업종 고등교육기관'], status:'active' },
+  { id:'gist', name:'광주과학기술원(GIST)', legal:'광주과학기술원', region:'호남권', scheme:'TMS',
+    campuses:['전 캠퍼스 합산'], members:4008, gfa:631041, baseline:null, credit:null, source:ENV, energySource:GHG,
+    carbon:[22175, 22722, 24196, 24365], energy:[458, 470, 500, 504],
+    notes:['건물부문 (2021–2024)'], status:'active' },
+  { id:'dgist', name:'대구경북과학기술원(DGIST)', legal:'재단법인 대구경북과학기술원', region:'영남권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:2998, gfa:671275, baseline:25925, credit:null, source:ENV, energySource:GHG,
+    carbon:[28529, 29435, 30361, 31474], energy:[590, 608, 612, 643],
+    notes:['건물부문'], status:'active' },
+  { id:'unist', name:'울산과학기술원(UNIST)', legal:'울산과학기술원', region:'영남권', scheme:'ETS',
+    campuses:['전 캠퍼스 합산'], members:6992, gfa:1041657, baseline:30206, credit:null, source:GHG, energySource:GHG,
+    carbon:[34395, 33509, 37403, 37607], energy:[715, 756, 776, 786],
+    notes:['건물부문(2021) / 이후 고등교육기관'], status:'active' }
 ];
 
 const ACTIVE = UNIVERSITIES.filter(u => u.status === 'active');
@@ -2638,6 +2732,43 @@ function logoHTML(u, size) {
 
 const byId = id => UNIVERSITIES.find(u => u.id === id);
 const byName = name => UNIVERSITIES.find(u => u.name === name);
+
+/* ------------------------------------------------------------
+   실데이터 보조 함수 — 출처·미제공·분캠
+------------------------------------------------------------ */
+function srcOf(u, tab) {
+  const v = u ? (tab === 'energy' ? u.energySource : u.source) : null;
+  return v || CONFIG.SOURCE_UNCONFIRMED;
+}
+function isExcluded(u, i) { return !!(u && u.excluded && u.excluded[YEARS[i]]); }
+/* 값이 없는 칸의 표시 문구: 제외 / 미제공!(탄소) / 데이터 없음(에너지) */
+function gapLabel(u, tab, i) {
+  if (isExcluded(u, i)) return CONFIG.EXCLUDED_LABEL;
+  return tab === 'carbon' ? CONFIG.MISSING_LABEL : NODATA;
+}
+function missingYears(u) {
+  return u && u.carbon ? YEARS.filter((_, i) => u.carbon[i] == null && !isExcluded(u, i)) : [];
+}
+function excludedYears(u) { return u && u.excluded ? YEARS.filter((_, i) => isExcluded(u, i)) : []; }
+function stampHTML(u, size) {
+  const yrs = missingYears(u);
+  if (!yrs.length) return '';
+  const tip = yrs.join('·') + '년 탄소배출량 미제공 — ' + CONFIG.MISSING_DESC;
+  return '<span class="stamp' + (size ? ' ' + size : '') + '" title="' + attr(tip) + '" data-tip="' +
+    attr(tipBody(u.name + ' · 탄소배출량 ' + CONFIG.MISSING_LABEL, [['미제공 연도', yrs.join(', ') + '년']]) +
+      '<div class="tip-src">' + esc(CONFIG.MISSING_DESC) + '</div>') + '">' + esc(CONFIG.MISSING_LABEL) + '</span>';
+}
+function srcFlagHTML(u, tab) {
+  if (!u || (tab === 'energy' ? u.energySource : tab === 'carbon' ? u.source : (u.source && u.energySource))) return '';
+  return '<span class="flag-chip" title="원자료에 출처가 기재되지 않아 확인 중입니다">' + esc(CONFIG.SOURCE_UNCONFIRMED) + '</span>';
+}
+/* 사전할당량은 법인 단위이므로 비교할 때는 본교 + 분캠 배출량을 합산합니다 */
+function allocCarbon(u, yi = LAST) {
+  const base = u.carbon ? u.carbon[yi] : null;
+  if (base == null) return null;
+  return base + (u.branches || []).reduce((a, b) => a + (b.carbon[yi] || 0), 0);
+}
+function firstIdx(arr) { return arr ? arr.findIndex(v => v != null) : -1; }
 
 /* ------------------------------------------------------------
    [D-1] 간단한 데이터 검증 — 누락 필드는 콘솔 경고로 알려 줍니다.
@@ -2709,9 +2840,10 @@ function deltaHTML(v) {
   return '<span class="delta ' + cls + '">' + arrow + ' ' + Math.abs(v).toFixed(1) + '%</span>';
 }
 function schemeName(s) { return s === 'ETS' ? '배출권거래제' : s === 'TMS' ? '목표관리제' : '자료 수집 중'; }
-function sourceLine(tab) {
-  return (tab === 'energy' ? CONFIG.SOURCE.ghgShort : CONFIG.SOURCE.ghgShort) +
-    '(' + CONFIG.SOURCE.ghgYear + ') · ' + CONFIG.SOURCE.alimiShort + '(' + CONFIG.SOURCE.alimiYear + ')';
+function sourceLine(tab, u) {
+  const main = u ? srcOf(u, tab) : CONFIG.SOURCE.ghgShort;
+  return main + (u && main === CONFIG.SOURCE_UNCONFIRMED ? '' : '(' + CONFIG.SOURCE.ghgYear + ')') + ' · ' +
+    CONFIG.SOURCE.alimiShort + '(' + CONFIG.SOURCE.alimiYear + ')';
 }
 /* [B-1] 순위별 강조 클래스 — scale 'r'(배출량, 파랑) / 'g'(감축률, 초록) */
 function rankClass(i, scale) {
@@ -2818,17 +2950,17 @@ const INFO = {
   },
   'carbon-percap': {
     t: '1인당 배출량',
-    def: '구성원 1명이 배출한 평균량입니다.',
-    f: '총 배출량 ÷ (재학생 + 전임교원 + 직원)',
+    def: '인구 1명당 평균 배출량입니다.',
+    f: '총 배출량 ÷ 인구수(교육통계서비스, 2024년)',
     u: 'kgCO₂e/명',
     c: '연구중심 대학이나 의과대학·병원 보유 대학은 구조적으로 높게 나타납니다.'
   },
   'carbon-perarea': {
     t: '면적당 배출량',
-    def: '건물 연면적 1㎡당 배출량입니다.',
-    f: '총 배출량 ÷ 연면적(㎡)',
+    def: '교지(캠퍼스 부지) 면적 1㎡당 배출량입니다.',
+    f: '총 배출량 ÷ 교지면적(㎡, 대학알리미 2024년)',
     u: 'kgCO₂e/㎡',
-    c: '실험동·병원·기숙사 구성에 따라 왜곡될 수 있어 참고용으로 활용해 주세요.'
+    c: '교지면적은 건물 연면적이 아닌 부지 면적이라, 부지가 넓은 학교는 낮게 나타납니다. 참고용으로 활용해 주세요.'
   },
   'energy-total': {
     t: '총 사용량',
@@ -2839,31 +2971,31 @@ const INFO = {
   },
   'energy-percap': {
     t: '1인당 사용량',
-    def: '구성원 1명이 사용한 평균 에너지량입니다.',
-    f: '총 사용량 ÷ (재학생 + 전임교원 + 직원)',
+    def: '인구 1명당 평균 에너지 사용량입니다.',
+    f: '총 사용량 ÷ 인구수(교육통계서비스, 2024년)',
     u: 'GJ/명 (1 GJ ≈ 277.8 kWh)',
     c: '구성원 수가 적고 연구 설비가 많은 대학은 높게 나타납니다.'
   },
   'energy-perarea': {
     t: '면적당 사용량',
-    def: '건물 연면적 1㎡당 에너지 사용량입니다.',
-    f: '총 사용량 ÷ 연면적(㎡)',
+    def: '교지(캠퍼스 부지) 면적 1㎡당 에너지 사용량입니다.',
+    f: '총 사용량 ÷ 교지면적(㎡, 대학알리미 2024년)',
     u: 'GJ/㎡',
     c: '건물 용도 구성에 따라 차이가 크므로 참고용 지표입니다.'
   },
   'baseline': {
-    t: '기준배출량',
-    def: '배출권거래제·목표관리제에서 할당·관리 기준이 되는 배출량입니다.',
-    f: '제도상 할당량(기관별 산정)',
-    u: 'tCO₂e',
-    c: '기준배출량이 없는 기관은 제도 대상이 아니거나 자료 확인이 필요한 경우입니다.'
+    t: '사전할당량',
+    def: '배출권거래제 대상 기관에 해당 연도 배출 허용량으로 미리 할당된 배출권 양입니다.',
+    f: '2024년 탄소배출량(분캠 포함 법인 합계) − 2024년 사전할당량',
+    u: 'tCO₂e (출처: 배출권시장정보플랫폼)',
+    c: '목표관리제 대상 기관은 사전할당량이 없습니다. 할당량은 법인 단위라 분캠 배출량까지 합산해 비교합니다.'
   },
   'campuses': {
     t: '포함 캠퍼스',
-    def: '화면의 수치에 포함된 캠퍼스 범위입니다.',
-    f: '명세서상 사업장(캠퍼스) 합계',
+    def: '탄소배출량 순위에 포함된 캠퍼스 범위입니다.',
+    f: '캠퍼스별 배출량이 나뉜 학교는 본교만, 나뉘지 않은 학교는 전 캠퍼스 합산',
     u: '—',
-    c: '분교·부속병원 포함 여부에 따라 학교 간 수치 차이가 생길 수 있습니다.'
+    c: '분캠 배출량은 상세 페이지에 따로 표시하며 순위에는 넣지 않습니다. 인구수도 같은 캠퍼스 범위로 맞췄습니다.'
   }
 };
 const infoPop = document.getElementById('infoPop');
@@ -3154,7 +3286,11 @@ function clearMySchool(e) {
    홈
 ============================================================ */
 function natTotals(tab) {
-  return YEARS.map((_, yi) => ACTIVE.reduce((a, u) => a + seriesOf(u, tab)[yi], 0));
+  return YEARS.map((_, yi) => ACTIVE.reduce((a, u) => a + (seriesOf(u, tab)[yi] || 0), 0));
+}
+/* 연도별로 값이 없는(미제공) 학교 수 — 전국 합계 툴팁에 함께 표시 */
+function natMissing(tab) {
+  return YEARS.map((_, yi) => ACTIVE.filter(u => seriesOf(u, tab)[yi] == null).length);
 }
 function renderHome() {
   const c = natTotals('carbon'), e = natTotals('energy');
@@ -3179,8 +3315,8 @@ function renderHome() {
     ' <span class="muted">(' + (cChg <= 0 ? '−' : '+') + fmt(Math.abs(Math.round(cAbs))) + ' tCO₂e)</span>';
   document.getElementById('natEnergyChg').innerHTML = '전년 대비 ' + deltaHTML(eChg);
 
-  drawMini('natCarbonChart', c, 'tCO₂e', '전국 대학 탄소배출량');
-  drawMini('natEnergyChart', e, 'TJ', '전국 대학 에너지사용량');
+  drawMini('natCarbonChart', c, 'tCO₂e', '전국 대학 탄소배출량', natMissing('carbon'), 'carbon');
+  drawMini('natEnergyChart', e, 'TJ', '전국 대학 에너지사용량', natMissing('energy'), 'energy');
   renderHomeTop5();
 
   document.getElementById('orbitSchoolCount').textContent = UNIVERSITIES.length + '개 대학';
@@ -3189,7 +3325,7 @@ function renderHome() {
 }
 
 /* 홈 미니 막대그래프 (+ [B-6] 툴팁) */
-function drawMini(id, arr, unit, label) {
+function drawMini(id, arr, unit, label, missing, tab) {
   const el = document.getElementById(id);
   const W = 300, H = 150, P = { l: 60, r: 8, t: 8, b: 22 };
   const dataMin = Math.min(...arr), dataMax = Math.max(...arr);
@@ -3210,10 +3346,12 @@ function drawMini(id, arr, unit, label) {
     const last = i === arr.length - 1;
     const prev = i > 0 ? arr[i - 1] : null;
     const rate = prev ? (v - prev) / prev * 100 : null;
+    const miss = missing ? missing[i] : 0;
+    const prevMiss = missing && i > 0 ? missing[i - 1] : 0;
     const tip = tipBody(label + ' · ' + YEARS[i] + '년', [
       ['값', fmt(Math.round(v)) + ' ' + unit],
-      ['전년 대비', rate == null ? '—' : (rate <= 0 ? '▼ ' : '▲ ') + Math.abs(rate).toFixed(1) + '%']
-    ], sourceLine('carbon'));
+      ['전년 대비', rate == null || miss || prevMiss ? '—' : (rate <= 0 ? '▼ ' : '▲ ') + Math.abs(rate).toFixed(1) + '%']
+    ].concat(miss ? [['집계 제외', miss + '개교 (값 없음·제외)']] : []), sourceLine(tab || 'carbon'));
     bars += '<rect x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' +
       Math.max(bh, 1).toFixed(1) + '" rx="4" fill="' + (last ? 'var(--accent)' : 'var(--rank3)') +
       '" tabindex="0" data-tip="' + attr(tip) + '"/>';
@@ -3230,7 +3368,7 @@ function renderHomeTop5() {
     const tip = tipBody(r.u.name, [
       ['총 배출량', fmt(r.u.carbon[LAST]) + ' tCO₂e'],
       ['전년 대비', deltaText(chg(r.u.carbon))]
-    ], sourceLine('carbon'));
+    ], sourceLine('carbon', r.u));
     return '<div class="rankrow" role="button" tabindex="0" data-tip="' + attr(tip) + '" onclick="openDetail(\'' + r.u.id +
       '\')" onkeydown="if(event.key===\'Enter\'){openDetail(\'' + r.u.id + '\')}">' +
       '<div class="rankcell"><span class="rankbadge ' + rankClass(i, 'r') + '">' + (i + 1) + '</span></div>' +
@@ -3245,7 +3383,7 @@ function renderHomeTop5() {
       ['감소율', deltaText(r.v)],
       ['감소량', fmt(Math.abs(Math.round(abs))) + ' tCO₂e'],
       ['총 배출량', fmt(r.u.carbon[LAST]) + ' tCO₂e']
-    ], sourceLine('carbon'));
+    ], sourceLine('carbon', r.u));
     return '<div class="rankrow" role="button" tabindex="0" data-tip="' + attr(tip) + '" onclick="openDetail(\'' + r.u.id +
       '\')" onkeydown="if(event.key===\'Enter\'){openDetail(\'' + r.u.id + '\')}">' +
       '<div class="rankcell"><span class="rankbadge ' + rankClass(i, 'g') + '">' + (i + 1) + '</span></div>' +
@@ -3385,14 +3523,18 @@ function renderRankList(rows) {
       [metricDefs(state.tab).find(d => d[0] === state.metric)[1], valText(r.v, state.metric) + ' ' + unit],
       ['전년 대비', deltaText(chg(series))],
       ['순위', (i + 1) + '위 / ' + rows.length + '개교']
-    ], sourceLine(state.tab));
+    ].concat(state.tab === 'carbon' && u.carbonNote ? [['범위', u.carbonNote]] : [])
+     .concat(state.tab === 'energy' && u.energyFlag ? [['확인 필요', '에너지 값 재확인 중']] : []), sourceLine(state.tab, u));
     return '<div class="rankrow' + (mine ? ' mine' : '') + (picked ? ' picked' : '') + '" data-id="' + u.id +
       '" role="button" tabindex="0" data-tip="' + attr(tip) + '">' +
       '<label class="pick" onclick="event.stopPropagation()"><input type="checkbox" ' + (picked ? 'checked' : '') +
       ' aria-label="' + attr(u.name + ' 비교 선택') + '" onchange="toggleSelect(\'' + u.id + '\')"></label>' +
       '<div class="rankcell"><span class="rankbadge ' + rc + '">' + (i + 1) + '</span></div>' +
       '<div class="name with-logo" title="' + attr(u.name) + '">' + logoHTML(u, 'md') + '<span class="nm">' + esc(u.name) +
-      '<small>' + esc(u.region + ' · ' + schemeName(u.scheme)) + '</small></span></div>' +
+      '<small>' + esc(u.region + ' · ' + schemeName(u.scheme)) + '</small></span>' +
+      '<span class="name-flags">' + (state.tab === 'carbon' ? stampHTML(u) : '') +
+      (state.tab === 'energy' && u.energyFlag ? '<span class="flag-chip" title="' + attr(u.energyFlag) + '">확인 필요</span>' : '') +
+      srcFlagHTML(u, state.tab) + '</span></div>' +
       '<div class="barcell"><div class="barfill ' + rc + '" style="width:0%" data-w="' + (r.v / max * 100).toFixed(1) + '"></div></div>' +
       '<div class="val">' + valText(r.v, state.metric) + '<small>' + unit + '</small></div></div>';
   }).join('');
@@ -3497,7 +3639,7 @@ function drawCmpLine(host, opt = {}) {
       const v = metricVal(u, tab, metric, i);
       return [
         '<span class="sw" style="background:' + colorOf(u) + '"></span>' + esc(u.name),
-        v == null ? NODATA : valText(v, metric) + ' ' + unit
+        v == null ? gapLabel(u, tab, i) : valText(v, metric) + ' ' + unit
       ];
     });
     const bw = (W - P.l - P.r) / YEARS.length;
@@ -3520,7 +3662,7 @@ function drawCmpLine(host, opt = {}) {
       const tip = tipBody(u.name + ' · ' + yr + '년', [
         ['값', valText(v, metric) + ' ' + unit],
         ['전년 대비', rate == null ? '—' : deltaText(rate)]
-      ], sourceLine(tab));
+      ], sourceLine(tab, u));
       dots += '<circle cx="' + x(i).toFixed(1) + '" cy="' + y(v).toFixed(1) + '" r="' + (i === LAST ? 5 : 3.6) +
         '" fill="' + color + '" stroke="#fff" stroke-width="1.8" tabindex="0" data-tip="' + attr(tip) + '"/>';
     });
@@ -3557,7 +3699,7 @@ function drawCmpBar(host, opt = {}) {
     const tip = tipBody(r.u.name + ' · ' + YEARS[LAST] + '년', [
       ['값', valText(r.v, metric) + ' ' + unit],
       ['전년 대비', deltaText(chg(seriesOf(r.u, tab)))]
-    ], sourceLine(tab));
+    ], sourceLine(tab, r.u));
     bars += '<rect x="' + (cx - bw / 2).toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + bw.toFixed(1) +
       '" height="' + Math.max(1, (H - P.b) - by).toFixed(1) + '" rx="5" fill="' + color +
       '" tabindex="0" data-tip="' + attr(tip) + '"/>';
@@ -3592,9 +3734,11 @@ function renderDetail() {
   document.getElementById('dLegal').innerHTML = '법인명 ' + esc(u.legal || '—') +
     ' · ' + esc(u.region) + ' · ' + esc(schemeName(u.scheme)) +
     ' · 포함 캠퍼스 ' + esc((u.campuses || []).join(', ') || '확인 중') +
+    (u.carbonNote ? ' (' + esc(u.carbonNote) + ')' : '') +
     ' <button class="info-btn" type="button" aria-expanded="false" data-info="campuses" aria-label="포함 캠퍼스 설명">i</button>';
   document.getElementById('detailSource').innerHTML =
-    '출처: ' + esc(CONFIG.SOURCE.ghg) + ' (' + CONFIG.SOURCE.ghgYear + ') · ' +
+    '출처: 탄소배출량 ' + (u.source ? esc(u.source) + ' (' + CONFIG.SOURCE.ghgYear + ')' : '<b>' + esc(CONFIG.SOURCE_UNCONFIRMED) + '</b>') +
+    ' · 에너지사용량 ' + (u.energySource ? esc(u.energySource) + ' (' + CONFIG.SOURCE.ghgYear + ')' : '<b>' + esc(CONFIG.SOURCE_UNCONFIRMED) + '</b>') + ' · ' +
     esc(CONFIG.SOURCE.alimi) + ' (' + CONFIG.SOURCE.alimiYear + ')' +
     (CONFIG.IS_SAMPLE_DATA ? ' · <b>현재 수치는 구조 검증용 샘플입니다.</b>' : '');
   document.getElementById('dSetMine').textContent = state.my === u.id ? '우리 학교로 설정됨' : '우리 학교로 설정';
@@ -3615,11 +3759,13 @@ function renderDetail() {
   document.getElementById('dlSchool').disabled = false;
 
   const rk = rankOf(u, 'carbon');
-  document.getElementById('dBadge').innerHTML = '전국 ' + rk + '위 <small>/ ' + ACTIVE.length + '개교 · 탄소배출량 낮은 순</small>';
+  document.getElementById('dBadge').innerHTML = '전국 ' + rk + '위 <small>/ ' + ACTIVE.length + '개교 · 탄소배출량 낮은 순</small>' +
+    stampHTML(u) + srcFlagHTML(u);
 
   const cChg = chg(u.carbon), eChg = chg(u.energy);
-  const dev = u.baseline ? u.carbon[LAST] - u.baseline : null;
-  const devPct = u.baseline ? (u.carbon[LAST] - u.baseline) / u.baseline * 100 : null;
+  const allocC = allocCarbon(u);
+  const dev = u.baseline && allocC != null ? allocC - u.baseline : null;
+  const devPct = dev != null ? dev / u.baseline * 100 : null;
   document.getElementById('dKpis').innerHTML =
     '<div class="card kpi"><div class="k-label">탄소배출량 (' + YEARS[LAST] + ')' +
     '<button class="info-btn" type="button" aria-expanded="false" data-info="carbon-total" aria-label="총 배출량 설명">i</button></div>' +
@@ -3634,13 +3780,13 @@ function renderDetail() {
     '<div class="card kpi"><div class="k-label">1인당 탄소배출량' +
     '<button class="info-btn" type="button" aria-expanded="false" data-info="carbon-percap" aria-label="1인당 배출량 설명">i</button></div>' +
     '<div class="k-val">' + fmt1(u.carbon[LAST] / u.members * 1000) + '<small>kgCO₂e/명</small></div>' +
-    '<div class="k-chg"><span class="muted">재학생+전임교원+직원 ' + fmt(u.members) + '명 기준</span></div></div>' +
+    '<div class="k-chg"><span class="muted">인구 ' + fmt(u.members) + '명(' + CONFIG.SOURCE.alimiYear + ') 기준</span></div></div>' +
 
-    '<div class="card kpi"><div class="k-label">기준배출량 대비' +
-    '<button class="info-btn" type="button" aria-expanded="false" data-info="baseline" aria-label="기준배출량 설명">i</button></div>' +
+    '<div class="card kpi"><div class="k-label">사전할당량 대비 (' + YEARS[LAST] + ')' +
+    '<button class="info-btn" type="button" aria-expanded="false" data-info="baseline" aria-label="사전할당량 설명">i</button></div>' +
     '<div class="k-val">' + (dev === null ? '—' : (dev <= 0 ? '−' : '+') + fmt(Math.abs(Math.round(dev)))) +
-    '<small>' + (dev === null ? '기준 없음' : 'tCO₂e') + '</small></div>' +
-    '<div class="k-chg">' + (devPct === null ? '<span class="muted">제도 미포함</span>' :
+    '<small>' + (dev === null ? '할당 없음' : 'tCO₂e') + '</small></div>' +
+    '<div class="k-chg">' + (devPct === null ? '<span class="muted">' + (u.scheme === 'TMS' ? '목표관리제(할당 대상 아님)' : '할당량 자료 없음') + '</span>' :
       deltaHTML(devPct) + ' <span class="muted">' + (dev <= 0 ? '감축 여유분 확보' : '초과 배출') + '</span>') + '</div></div>';
 
   setDetailTab(state.detailTab);
@@ -3664,70 +3810,147 @@ function setDetailTab(t) {
   }
 }
 function renderInfo(u) {
+  const fi = firstIdx(u.carbon);
+  const allocC = allocCarbon(u);
+  const hasAlloc = u.baseline && allocC != null;
   const items = [
     ['제도유형', schemeName(u.scheme)],
     ['권역', u.region],
     ['법인명', u.legal || '—'],
-    ['포함 캠퍼스', (u.campuses || []).join(', ') || '확인 중'],
-    ['총구성원수 (재학생+전임교원+직원)', fmt(u.members) + '명'],
-    ['캠퍼스 연면적', fmt(u.gfa) + '㎡'],
-    ['기준배출량', u.baseline ? fmt(u.baseline) + ' tCO₂e' : '해당 없음'],
-    ['기준대비 증감량', u.baseline ? ((u.carbon[LAST] - u.baseline <= 0 ? '−' : '+') + fmt(Math.abs(u.carbon[LAST] - u.baseline)) + ' tCO₂e') : '—'],
-    ['기준대비 증감률', u.baseline ? ((u.carbon[LAST] - u.baseline) / u.baseline * 100).toFixed(1) + '%' : '—'],
-    ['감축 여유분', u.baseline && u.carbon[LAST] <= u.baseline ? fmt(u.baseline - u.carbon[LAST]) + ' tCO₂e' : '—'],
-    ['초과 배출량', u.baseline && u.carbon[LAST] > u.baseline ? fmt(u.carbon[LAST] - u.baseline) + ' tCO₂e' : '없음'],
-    ['탄소배출권 구매액(연간)', u.credit ? fmt(u.credit) + '백만 원' : '—'],
+    ['포함 캠퍼스 (순위 기준)', ((u.campuses || []).join(', ') || '확인 중') + (u.carbonNote ? ' — ' + u.carbonNote : '')],
+    ['탄소배출량 출처', srcOf(u, 'carbon')],
+    ['에너지사용량 출처', srcOf(u, 'energy')],
+    ['인구수 (' + CONFIG.SOURCE.alimiYear + ', 교육통계서비스)', fmt(u.members) + '명'],
+    ['교지면적 (' + CONFIG.SOURCE.alimiYear + ', 대학알리미)', fmt(u.gfa) + '㎡'],
+    ['사전할당량 (' + YEARS[LAST] + ')', u.baseline ? fmt(u.baseline) + ' tCO₂e' : (u.scheme === 'TMS' ? '해당 없음 (목표관리제)' : '자료 없음')]
+  ];
+  if (hasAlloc) {
+    const d = allocC - u.baseline;
+    if (u.branches && u.branches.length) items.push(['할당량 비교용 배출량 (본교+분캠)', fmt(allocC) + ' tCO₂e']);
+    items.push(
+      ['할당량 대비 증감량', (d <= 0 ? '−' : '+') + fmt(Math.abs(d)) + ' tCO₂e'],
+      ['할당량 대비 증감률', (d / u.baseline * 100).toFixed(1) + '%'],
+      [d <= 0 ? '할당 여유분' : '할당 초과량', fmt(Math.abs(d)) + ' tCO₂e']
+    );
+  }
+  (u.branches || []).forEach(b => {
+    items.push(['분캠 탄소배출량 — ' + b.name + ' (' + YEARS[LAST] + ')',
+      b.carbon[LAST] == null ? gapLabel(u, 'carbon', LAST) : fmt(b.carbon[LAST]) + ' tCO₂e (순위 미반영)']);
+  });
+  items.push(
     ['면적당 탄소배출량', fmt2(u.carbon[LAST] / u.gfa * 1000) + ' kgCO₂e/㎡'],
     ['면적당 에너지사용량', fmt2(u.energy[LAST] / u.gfa * 1000) + ' GJ/㎡'],
     ['1인당 에너지사용량', fmt1(u.energy[LAST] / u.members * 1000) + ' GJ/명'],
-    ['누적 감축 (' + YEARS[0] + '→' + YEARS[LAST] + ')', (() => {
-      const p0 = u.carbon[0] / u.members, p1 = u.carbon[LAST] / u.members;
-      const d = (p0 - p1) / p0 * 100;
-      return (d >= 0 ? '−' : '+') + Math.abs(d).toFixed(1) + '% (1인당 기준)';
+    ['누적 증감 (' + YEARS[fi] + '→' + YEARS[LAST] + ', 총량)', (() => {
+      if (fi < 0 || fi === LAST) return '—';
+      const d = (u.carbon[LAST] - u.carbon[fi]) / u.carbon[fi] * 100;
+      return (d <= 0 ? '−' : '+') + Math.abs(d).toFixed(1) + '%';
     })()]
-  ];
+  );
+  const missing = missingYears(u);
   document.getElementById('dInfoArea').innerHTML = items.map(([l, v]) =>
     '<div class="card inforow"><span class="il">' + esc(l) + '</span><span class="iv">' + esc(v) + '</span></div>').join('') +
-    '<div class="muted" style="grid-column:1/-1">※ 면적당 지표는 캠퍼스 특성(부속시설·병원 등)에 따라 왜곡될 수 있습니다. · 1인당 지표의 분모는 재학생+전임교원+직원 합계입니다.</div>';
+    (missing.length ? '<div class="card inforow"><span class="il">탄소배출량 미제공 연도</span><span class="iv">' +
+      esc(missing.join(', ') + '년') + stampHTML(u) + '</span></div>' : '') +
+    (excludedYears(u).length ? '<div class="card inforow"><span class="il">제외 연도 (탄소·에너지)</span><span class="iv">' +
+      esc(excludedYears(u).join(', ') + '년') + '</span></div>' : '') +
+    notesHTML(u, 'grid-column:1/-1') +
+    '<div class="muted" style="grid-column:1/-1">※ 면적당 지표는 교지(부지) 면적 기준이라 캠퍼스 특성에 따라 왜곡될 수 있습니다. · 1인당 지표의 분모는 ' +
+    CONFIG.SOURCE.alimiYear + '년 인구수(교육통계서비스)입니다.</div>';
+}
+/* 학교별 데이터 유의사항 (엑셀 '각 데이터의 유의사항' + 데이터팀 확인 사항) */
+function notesHTML(u, style) {
+  const list = (u.notes || []).slice();
+  if (u.energyFlag) list.push('⚠ ' + u.energyFlag);
+  excludedYears(u).forEach(y => list.push('[' + y + '년 ' + CONFIG.EXCLUDED_LABEL + '] ' + u.excluded[y]));
+  const unk = [!u.source && '탄소배출량', !u.energySource && '에너지사용량'].filter(Boolean);
+  if (unk.length) list.push(unk.join('·') + ' 원자료에 출처가 기재되지 않아 ' + CONFIG.SOURCE_UNCONFIRMED + '입니다.');
+  if (!list.length) return '';
+  return '<div class="data-note"' + (style ? ' style="' + style + '"' : '') + '><b>데이터 유의사항</b><br>' +
+    list.map(t => '· ' + esc(t)).join('<br>') + '</div>';
 }
 function drawLine(container, u, tab) {
   const arr = seriesOf(u, tab);
   const unit = tab === 'carbon' ? 'tCO₂e' : 'TJ';
   const label = tab === 'carbon' ? '탄소배출량' : '에너지사용량';
+  const vals = arr.filter(v => v != null);
   const W = 760, H = 280, P = { l: 66, r: 20, t: 24, b: 34 };
-  const min = Math.min(...arr) * .985, max = Math.max(...arr) * 1.015;
+  const min = Math.min(...vals) * .985, max = Math.max(...vals) * 1.015;
+  const span = (max - min) || max || 1;
   const x = i => P.l + (W - P.l - P.r) * i / (arr.length - 1);
-  const y = v => P.t + (H - P.t - P.b) * (1 - (v - min) / (max - min));
-  let grid = '', labels = '', dots = '', xls = '';
+  const y = v => P.t + (H - P.t - P.b) * (1 - (v - min) / span);
+  let grid = '', labels = '', dots = '', xls = '', stamps = '';
   for (let g = 0; g <= 3; g++) {
-    const gv = min + (max - min) * g / 3, gy = y(gv);
+    const gv = min + span * g / 3, gy = y(gv);
     grid += '<line x1="' + P.l + '" y1="' + gy + '" x2="' + (W - P.r) + '" y2="' + gy + '" stroke="#E3E8EE" stroke-width="1.5"/>';
     labels += '<text x="' + (P.l - 8) + '" y="' + (gy + 4) + '" text-anchor="end" font-size="11" fill="#5A6675">' + fmt(Math.round(gv)) + '</text>';
   }
-  const pts = arr.map((v, i) => x(i) + ',' + y(v)).join(' ');
-  const area = P.l + ',' + (H - P.b) + ' ' + pts + ' ' + (W - P.r) + ',' + (H - P.b);
+  const idx = arr.map((v, i) => v == null ? -1 : i).filter(i => i >= 0);
+  const pts = idx.map(i => x(i) + ',' + y(arr[i])).join(' ');
+  const area = idx.length ? x(idx[0]) + ',' + (H - P.b) + ' ' + pts + ' ' + x(idx[idx.length - 1]) + ',' + (H - P.b) : '';
   arr.forEach((v, i) => {
-    const prev = i > 0 ? arr[i - 1] : null;
-    const rate = prev ? (v - prev) / prev * 100 : null;
+    xls += '<text x="' + x(i) + '" y="' + (H - P.b + 20) + '" text-anchor="middle" font-size="11.5" fill="#5A6675">' + YEARS[i] + '</text>';
+    if (v == null) {
+      const excl = isExcluded(u, i);
+      const missLabel = gapLabel(u, tab, i);
+      const tip = tipBody(u.name + ' · ' + YEARS[i] + '년', [[label, missLabel]]) +
+        (excl ? '<div class="tip-src">' + esc(u.excluded[YEARS[i]]) + '</div>'
+          : tab === 'carbon' ? '<div class="tip-src">' + esc(CONFIG.MISSING_DESC) + '</div>' : '');
+      const cy = (P.t + H - P.b) / 2;
+      const sx = Math.min(Math.max(x(i), P.l + 52), W - P.r - 52);
+      stamps += tab === 'carbon' && !excl
+        ? '<g transform="rotate(-8 ' + sx + ' ' + cy + ')" tabindex="0" data-tip="' + attr(tip) + '" style="cursor:help">' +
+          '<rect x="' + (sx - 46) + '" y="' + (cy - 17) + '" width="92" height="34" rx="4" fill="#FFF5F5" stroke="#B91C1C" stroke-width="2.5"/>' +
+          '<rect x="' + (sx - 41) + '" y="' + (cy - 12) + '" width="82" height="24" rx="2" fill="none" stroke="#B91C1C" stroke-width="1"/>' +
+          '<text x="' + sx + '" y="' + (cy + 6) + '" text-anchor="middle" font-size="16" font-weight="900" letter-spacing="1.5" fill="#B91C1C">' + esc(missLabel) + '</text></g>'
+        : '<g tabindex="0" data-tip="' + attr(tip) + '" style="cursor:help">' +
+          (excl ? '<rect x="' + (sx - 30) + '" y="' + (cy - 13) + '" width="60" height="26" rx="13" fill="#F3F6F9" stroke="#CBD5E1"/>' : '') +
+          '<text x="' + sx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="' + (excl ? 800 : 400) + '" fill="#8A95A3">' + esc(missLabel) + '</text></g>';
+      return;
+    }
+    let pi = i - 1; while (pi >= 0 && arr[pi] == null) pi--;
+    const rate = pi === i - 1 && pi >= 0 ? (v - arr[pi]) / arr[pi] * 100 : null;
     const tip = tipBody(u.name + ' · ' + YEARS[i] + '년', [
       [label, fmt(v) + ' ' + unit],
       ['전년 대비', rate == null ? '—' : deltaText(rate)]
-    ], sourceLine(tab));
+    ], sourceLine(tab, u));
     dots += '<circle cx="' + x(i) + '" cy="' + y(v) + '" r="' + (i === LAST ? 6.5 : 5) + '" fill="' +
       (i === LAST ? 'var(--mine)' : 'var(--accent)') + '" stroke="#fff" stroke-width="2" tabindex="0" data-tip="' + attr(tip) + '"/>';
-    xls += '<text x="' + x(i) + '" y="' + (H - P.b + 20) + '" text-anchor="middle" font-size="11.5" fill="#5A6675">' + YEARS[i] + '</text>';
   });
   container.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:10px;flex-wrap:wrap">' +
-    '<b style="font-size:14.5px">연도별 ' + label + ' (' + unit + ')</b>' +
+    '<b style="font-size:14.5px">연도별 ' + label + ' (' + unit + ')' +
+    (tab === 'carbon' && u.carbonNote ? ' <span class="muted" style="font-weight:600">· ' + esc(u.carbonNote) + '</span>' : '') +
+    (tab === 'energy' && u.energyFlag ? '<span class="flag-chip" title="' + attr(u.energyFlag) + '">확인 필요</span>' : '') + '</b>' +
     '<span class="muted">' + YEARS[LAST] + '년: <b style="color:var(--accent)">' + fmt(arr[LAST]) + ' ' + unit + '</b></span></div>' +
+    (tab === 'carbon' && missingYears(u).length
+      ? '<div class="stamp-banner">' + stampHTML(u, 'lg') + '<span><b>' + esc(missingYears(u).join('·')) + '년 탄소배출량</b>이 공개 자료에서 확인되지 않았습니다.<br>' +
+        '<span style="opacity:.85">자료가 확인되면 바로 반영합니다. 오류 제보: net0campus.kr@gmail.com</span></span></div>' : '') +
     '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + attr(label + ' 연도별 추이') + '">' +
     grid + labels +
-    '<polygon points="' + area + '" fill="rgba(29,78,216,.09)"/>' +
+    (area ? '<polygon points="' + area + '" fill="rgba(29,78,216,.09)"/>' : '') +
     '<polyline points="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
-    dots + xls + '</svg>' +
+    dots + stamps + xls + '</svg>' +
     '<div class="muted" style="margin-top:6px">점에 마우스를 올리거나(모바일은 탭) 키보드로 이동하면 연도별 수치와 출처를 볼 수 있습니다.</div>' +
-    seasonHTML(arr[LAST], label, unit, u);
+    (excludedYears(u).length ? '<div class="data-note"><b>' + esc(excludedYears(u).join('·')) + '년 ' + CONFIG.EXCLUDED_LABEL + '</b><br>' +
+      excludedYears(u).map(y => esc(u.excluded[y])).join('<br>') + '</div>' : '') +
+    (tab === 'carbon' ? branchHTML(u) : '') +
+    (tab === 'energy' && u.energyFlag ? '<div class="data-note"><b>⚠ 확인 필요</b><br>' + esc(u.energyFlag) + '</div>' : '') +
+    (CONFIG.IS_SAMPLE_DATA ? seasonHTML(arr[LAST], label, unit, u) : '');
+}
+/* 분캠 탄소배출량 — 순위에는 넣지 않고 따로 보여 줍니다 */
+function branchHTML(u) {
+  if (!u.branches || !u.branches.length) return '';
+  const cell = (v, i) => v != null ? fmt(v) : isExcluded(u, i) ? '<span class="muted">' + CONFIG.EXCLUDED_LABEL + '</span>'
+    : '<span class="stamp" style="margin:0">' + esc(CONFIG.MISSING_LABEL) + '</span>';
+  return '<div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">' +
+    '<b style="font-size:14px">분캠 탄소배출량 <span class="muted">(tCO₂e · 순위 미반영)</span></b>' +
+    '<div style="overflow-x:auto"><table class="branch-table"><thead><tr><th>구분</th>' +
+    YEARS.map(yr => '<th>' + yr + '</th>').join('') + '</tr></thead><tbody>' +
+    '<tr><td><b>' + esc((u.campuses || []).join(', ')) + '</b> (순위 기준)</td>' + u.carbon.map((v, i) => '<td>' + cell(v, i) + '</td>').join('') + '</tr>' +
+    u.branches.map(b => '<tr><td>' + esc(b.name) + '</td>' + b.carbon.map((v, i) => '<td>' + cell(v, i) + '</td>').join('') + '</tr>').join('') +
+    '</tbody></table></div>' +
+    '<div class="muted" style="margin-top:6px">※ 에너지사용량은 캠퍼스 구분이 없어 분캠을 포함한 값일 수 있습니다.</div></div>';
 }
 function seasonHTML(annual, label, unit, u) {
   const seasons = [['봄', .21], ['여름', .29], ['가을', .20], ['겨울', .30]];
@@ -3756,7 +3979,7 @@ function renderSimilar(u) {
     return '<div class="card simcard" role="button" tabindex="0" onclick="openDetail(\'' + x.id + '\')" ' +
       'onkeydown="if(event.key===\'Enter\'){openDetail(\'' + x.id + '\')}">' +
       '<div class="sn">' + esc(x.name) + ' <span class="muted">· 전국 ' + r + '위</span></div>' +
-      '<div class="sv">구성원 ' + fmt(x.members) + '명 · ' + fmt(x.carbon[LAST]) + ' tCO₂e</div></div>';
+      '<div class="sv">인구 ' + fmt(x.members) + '명 · ' + fmt(x.carbon[LAST]) + ' tCO₂e</div></div>';
   }).join('');
 }
 function shareSchool() {
@@ -3813,9 +4036,19 @@ function saveCsv(filename, lines) {
 }
 /* 학교 × 연도 상세 행 (D-2 공통 포맷) */
 const DETAIL_HEADER = ['학교명', '법인명', '지역', '제도유형', '연도', '포함캠퍼스',
-  '총배출량(tCO2e)', '에너지총사용량(TJ)', '총구성원수(명)', '연면적(m2)',
+  '총배출량(tCO2e)', '에너지총사용량(TJ)', '인구수_2024(명)', '교지면적_2024(m2)',
   '1인당배출량(kgCO2e/인)', '면적당배출량(kgCO2e/m2)', '1인당에너지(GJ/인)', '면적당에너지(GJ/m2)',
-  '기준배출량(tCO2e)', '출처', '기준연도', '업데이트'];
+  '사전할당량_2024(tCO2e)', '분캠배출량(tCO2e)', '출처', '유의사항', '업데이트'];
+function branchCsv(u, i) {
+  return (u.branches || []).map(b => b.name + ' ' + (b.carbon[i] == null ? gapLabel(u, 'carbon', i) : b.carbon[i])).join(' / ');
+}
+function notesCsv(u) {
+  return (u.notes || []).concat(excludedYears(u).map(y => '[' + y + '년 제외] ' + u.excluded[y]))
+    .concat(u.energyFlag ? ['[확인 필요] ' + u.energyFlag] : []).join(' / ');
+}
+function srcCsv(u) {
+  return '탄소: ' + srcOf(u, 'carbon') + ' / 에너지: ' + srcOf(u, 'energy') + ' / 인구·면적: ' + CONFIG.SOURCE.alimiShort;
+}
 function detailRows(list, from, to) {
   const out = [];
   list.forEach(u => {
@@ -3824,14 +4057,14 @@ function detailRows(list, from, to) {
       const c = u.carbon ? u.carbon[i] : null;
       const e = u.energy ? u.energy[i] : null;
       out.push([
-        u.name, u.legal || '', u.region, schemeName(u.scheme), yr, (u.campuses || []).join(' / '),
-        c ?? '', e ?? '', u.members ?? '', u.gfa ?? '',
+        u.name, u.legal || '', u.region, schemeName(u.scheme), yr, (u.campuses || []).join(' / ') + (u.carbonNote ? ' (' + u.carbonNote + ')' : ''),
+        c ?? gapLabel(u, 'carbon', i), e ?? (isExcluded(u, i) ? CONFIG.EXCLUDED_LABEL : ''), u.members ?? '', u.gfa ?? '',
         c != null && u.members ? (c / u.members * 1000).toFixed(2) : '',
         c != null && u.gfa ? (c / u.gfa * 1000).toFixed(3) : '',
         e != null && u.members ? (e / u.members * 1000).toFixed(2) : '',
         e != null && u.gfa ? (e / u.gfa * 1000).toFixed(3) : '',
-        u.baseline ?? '', CONFIG.SOURCE.ghgShort + '·' + CONFIG.SOURCE.alimiShort,
-        CONFIG.SOURCE.ghgYear, CONFIG.UPDATED
+        u.baseline ?? '', branchCsv(u, i), srcCsv(u),
+        notesCsv(u), CONFIG.UPDATED
       ].map(csvCell).join(','));
     });
   });
@@ -3886,30 +4119,34 @@ function runDatasetDownload() {
     lines.push(['학교명', '법인명', '지역', '제도유형', '연도', '지표', '값', '단위', '출처'].map(csvCell).join(','));
     list.forEach(u => YEARS.forEach((yr, i) => {
       if (yr < from || yr > to) return;
-      const push = (metricLabel, value, unit) => lines.push(
+      const push = (metricLabel, value, unit, tabKey) => lines.push(
         [u.name, u.legal || '', u.region, schemeName(u.scheme), yr, metricLabel, value, unit,
-          CONFIG.SOURCE.ghgShort + '·' + CONFIG.SOURCE.alimiShort].map(csvCell).join(','));
-      if (wantC && u.carbon) {
+          srcOf(u, tabKey || 'carbon') + (/1인당|면적당/.test(metricLabel) ? '·' + CONFIG.SOURCE.alimiShort : '')].map(csvCell).join(','));
+      if (wantC && u.carbon && u.carbon[i] == null) push('총배출량', gapLabel(u, 'carbon', i), 'tCO2e');
+      else if (wantC && u.carbon) {
         push('총배출량', u.carbon[i], 'tCO2e');
         if (u.members) push('1인당배출량', (u.carbon[i] / u.members * 1000).toFixed(2), 'kgCO2e/인');
         if (u.gfa) push('면적당배출량', (u.carbon[i] / u.gfa * 1000).toFixed(3), 'kgCO2e/m2');
       }
-      if (wantE && u.energy) {
-        push('에너지총사용량', u.energy[i], 'TJ');
-        if (u.members) push('1인당에너지', (u.energy[i] / u.members * 1000).toFixed(2), 'GJ/인');
-        if (u.gfa) push('면적당에너지', (u.energy[i] / u.gfa * 1000).toFixed(3), 'GJ/m2');
+      if (wantC) (u.branches || []).forEach(b =>
+        push('분캠배출량(' + b.name + ')', b.carbon[i] == null ? gapLabel(u, 'carbon', i) : b.carbon[i], 'tCO2e'));
+      if (wantE && u.energy && u.energy[i] == null && isExcluded(u, i)) push('에너지총사용량', CONFIG.EXCLUDED_LABEL, 'TJ', 'energy');
+      if (wantE && u.energy && u.energy[i] != null) {
+        push('에너지총사용량', u.energy[i], 'TJ', 'energy');
+        if (u.members) push('1인당에너지', (u.energy[i] / u.members * 1000).toFixed(2), 'GJ/인', 'energy');
+        if (u.gfa) push('면적당에너지', (u.energy[i] / u.gfa * 1000).toFixed(3), 'GJ/m2', 'energy');
       }
     }));
   } else {
     const years = YEARS.filter(y => y >= from && y <= to);
-    const header = ['학교명', '법인명', '지역', '제도유형', '총구성원수(명)', '연면적(m2)']
+    const header = ['학교명', '법인명', '지역', '제도유형', '출처', '인구수_2024(명)', '교지면적_2024(m2)']
       .concat(wantC ? years.map(y => y + '_총배출량(tCO2e)') : [])
       .concat(wantE ? years.map(y => y + '_에너지총사용량(TJ)') : []);
     lines.push(header.map(csvCell).join(','));
     list.forEach(u => {
-      const row = [u.name, u.legal || '', u.region, schemeName(u.scheme), u.members ?? '', u.gfa ?? '']
-        .concat(wantC ? years.map(y => (u.carbon ? u.carbon[YEARS.indexOf(y)] : '')) : [])
-        .concat(wantE ? years.map(y => (u.energy ? u.energy[YEARS.indexOf(y)] : '')) : []);
+      const row = [u.name, u.legal || '', u.region, schemeName(u.scheme), srcCsv(u), u.members ?? '', u.gfa ?? '']
+        .concat(wantC ? years.map(y => (u.carbon ? (u.carbon[YEARS.indexOf(y)] ?? gapLabel(u, 'carbon', YEARS.indexOf(y))) : '')) : [])
+        .concat(wantE ? years.map(y => (u.energy ? (u.energy[YEARS.indexOf(y)] ?? (isExcluded(u, YEARS.indexOf(y)) ? CONFIG.EXCLUDED_LABEL : '')) : '')) : []);
       lines.push(row.map(csvCell).join(','));
     });
   }
@@ -4765,7 +5002,9 @@ function bindEvents() {
     ? '※ 본 화면의 수치는 플랫폼 구조 검증을 위한 샘플 데이터입니다. 실제 서비스 시 ' + esc(CONFIG.SOURCE.ghg) +
       ', ' + esc(CONFIG.SOURCE.alimi) + ' 데이터로 교체됩니다. 1인당 지표의 분모(총구성원수)는 재학생+전임교원+직원 합계 기준입니다.'
     : '※ 데이터 출처: ' + esc(CONFIG.SOURCE.ghg) + ' (' + CONFIG.SOURCE.ghgYear + '), ' +
-      esc(CONFIG.SOURCE.alimi) + ' (' + CONFIG.SOURCE.alimiYear + '). 1인당 지표의 분모(총구성원수)는 재학생+전임교원+직원 합계 기준입니다.';
+      esc(CONFIG.SOURCE.alimi) + ' (' + CONFIG.SOURCE.alimiYear + '). 1인당 지표의 분모는 ' + CONFIG.SOURCE.alimiYear +
+      '년 인구수(교육통계서비스), 면적당 지표의 분모는 교지면적(대학알리미)입니다. 캠퍼스별 배출량이 나뉜 학교는 본교만 순위에 반영하고 분캠은 상세 페이지에 따로 표시합니다. ' +
+      '<b style="color:#B91C1C">' + esc(CONFIG.MISSING_LABEL) + '</b> 표시는 ' + esc(CONFIG.MISSING_DESC);
 }
 
 function init() {
