@@ -1528,6 +1528,15 @@ section.timeline{margin-top:36px}
   <div class="crumb"><button type="button" onclick="go('home')">홈</button> › 공지사항</div>
   <h3 class="section-title">📌 공지사항</h3>
   <div class="card noticeboard">
+    <div class="nb-row clickable" onclick="openGame()" role="button" tabindex="0" aria-haspopup="dialog"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openGame();}">
+      <span class="notice-tag n2">캠페인</span>
+      <div class="nb-body">
+        <div class="notice-title">🏆 우리 학교를 지켜라! 대학 대항전 미니게임 오픈<span class="nb-new">NEW</span></div>
+        <div class="notice-desc">게임 한 판으로 우리 학교를 응원하세요. 점수는 학교 순위에 바로 더해지고, 참여하신 분 중 추첨해 기프티콘을 드려요. 이 글을 누르면 바로 게임이 시작돼요. ▶</div>
+      </div>
+      <div class="notice-date">2026.10.06</div>
+    </div>
     <div class="nb-row clickable" onclick="openNotice()" role="button" tabindex="0"
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNotice();}">
       <span class="notice-tag n3">행사</span>
