@@ -426,7 +426,7 @@ svg{display:block}
 }
 .u-title{display:flex;align-items:center;gap:12px}
 
-/* ---------- 홈: 대학 대항전 캠페인 (TOP5 순위와 공지사항 사이) ---------- */
+/* ---------- 홈: 대학 대항전 캠페인 (공지사항 제목 바로 아래) ---------- */
 .campaign{
   margin-top:34px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;
   padding:26px 26px 24px;border-radius:20px;color:#fff;position:relative;overflow:hidden;
@@ -538,6 +538,7 @@ section.timeline{margin-top:36px}
 
 /* ---------- 공지사항 ---------- */
 .notice-sec{margin-top:36px}
+.notice-sec .campaign{margin:0 0 16px}
 .notice-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
 .notice-card{padding:18px 20px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .notice-card:hover{border-color:var(--accent-line);box-shadow:var(--shadow-hover)}
@@ -1195,46 +1196,45 @@ section.timeline{margin-top:36px}
     </div>
   </div>
 
-  <!-- ============ 대학 대항전 캠페인 ============
-       ✏️ 수정할 곳: 기간·경품 문구(.cp-meta), 참여 신청 링크(id="campaignApply"의 href)
-       href 를 비워 두면 버튼이 '신청 링크 준비 중'으로 표시됩니다.
-       실시간 순위는 firebase-config.js 에 연결 정보를 넣으면 자동으로 나타납니다. -->
-  <section class="campaign" aria-labelledby="campaignTitle">
-    <div class="cp-main">
-      <div class="cp-tags"><span class="cp-tag">CAMPAIGN</span><span class="cp-tag ghost">미니게임 · 대학 대항전</span></div>
-      <h3 id="campaignTitle">🏆 우리 학교를 지켜라! 대학 대항전</h3>
-      <p class="cp-sub">게임 한 판으로 우리 학교를 응원하세요. 점수는 학교 순위에 바로 더해지고, 참여하신 분 중 추첨해 <b>기프티콘</b>을 드려요.</p>
-      <div class="cp-meta">
-        <span><em>기간</em>추후 공지</span>
-        <span><em>경품</em>추첨 기프티콘 🎁</span>
-      </div>
-      <ol class="cp-steps">
-        <li><span class="n">1</span><span><strong>게임 한 판</strong><small>좋은 건 받고, 나쁜 건 피하기!</small></span></li>
-        <li><span class="n">2</span><span><strong>점수 자동 반영</strong><small>우리 학교 순위에 바로 더해져요</small></span></li>
-        <li><span class="n">3</span><span><strong>참여 신청</strong><small>신청하면 기프티콘 추첨 응모 완료</small></span></li>
-      </ol>
-      <div class="cp-actions">
-        <button class="btn btn-play cp-play" type="button" onclick="openGame()" aria-haspopup="dialog">게임 시작 ▶</button>
-        <a class="btn btn-apply" id="campaignApply" href="" target="_blank" rel="noopener noreferrer">참여 신청하기 ↗</a>
-      </div>
-    </div>
-    <aside class="cp-board" aria-labelledby="cpBoardTitle">
-      <div class="cp-board-head">
-        <h4 id="cpBoardTitle">실시간 학교 순위</h4>
-        <span class="cp-live" id="cpLive" hidden><i></i>LIVE</span>
-      </div>
-      <p class="cp-board-sub">게임 점수 합산 기준</p>
-      <ol class="cp-rank" id="cpRank" aria-live="polite"><li class="cp-empty">순위를 불러오는 중…</li></ol>
-      <button class="cp-more" id="cpMore" type="button" hidden onclick="toggleCampaignRank()">전체 학교 보기</button>
-      <p class="cp-note">※ 게임 점수로 매긴 순위예요. 실제 탄소중립 성과와는 관계없어요.</p>
-    </aside>
-  </section>
-
   <section class="notice-sec">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <h3 class="section-title" style="margin-bottom:0">📌 공지사항</h3>
       <button class="btn btn-ghost btn-sm" type="button" onclick="go('notice')">전체보기</button>
     </div>
+    <!-- ============ 대학 대항전 캠페인 ============
+         ✏️ 수정할 곳: 기간·경품 문구(.cp-meta), 참여 신청 링크(id="campaignApply"의 href)
+         href 를 비워 두면 버튼이 '신청 링크 준비 중'으로 표시됩니다.
+         실시간 순위는 firebase-config.js 에 연결 정보를 넣으면 자동으로 나타납니다. -->
+    <section class="campaign" aria-labelledby="campaignTitle">
+      <div class="cp-main">
+        <div class="cp-tags"><span class="cp-tag">CAMPAIGN</span><span class="cp-tag ghost">미니게임 · 대학 대항전</span></div>
+        <h3 id="campaignTitle">🏆 우리 학교를 지켜라! 대학 대항전</h3>
+        <p class="cp-sub">게임 한 판으로 우리 학교를 응원하세요. 점수는 학교 순위에 바로 더해지고, 참여하신 분 중 추첨해 <b>기프티콘</b>을 드려요.</p>
+        <div class="cp-meta">
+          <span><em>기간</em>추후 공지</span>
+          <span><em>경품</em>추첨 기프티콘 🎁</span>
+        </div>
+        <ol class="cp-steps">
+          <li><span class="n">1</span><span><strong>게임 한 판</strong><small>좋은 건 받고, 나쁜 건 피하기!</small></span></li>
+          <li><span class="n">2</span><span><strong>점수 자동 반영</strong><small>우리 학교 순위에 바로 더해져요</small></span></li>
+          <li><span class="n">3</span><span><strong>참여 신청</strong><small>신청하면 기프티콘 추첨 응모 완료</small></span></li>
+        </ol>
+        <div class="cp-actions">
+          <button class="btn btn-play cp-play" type="button" onclick="openGame()" aria-haspopup="dialog">게임 시작 ▶</button>
+          <a class="btn btn-apply" id="campaignApply" href="" target="_blank" rel="noopener noreferrer">참여 신청하기 ↗</a>
+        </div>
+      </div>
+      <aside class="cp-board" aria-labelledby="cpBoardTitle">
+        <div class="cp-board-head">
+          <h4 id="cpBoardTitle">실시간 학교 순위</h4>
+          <span class="cp-live" id="cpLive" hidden><i></i>LIVE</span>
+        </div>
+        <p class="cp-board-sub">게임 점수 합산 기준</p>
+        <ol class="cp-rank" id="cpRank" aria-live="polite"><li class="cp-empty">순위를 불러오는 중…</li></ol>
+        <button class="cp-more" id="cpMore" type="button" hidden onclick="toggleCampaignRank()">전체 학교 보기</button>
+        <p class="cp-note">※ 게임 점수로 매긴 순위예요. 실제 탄소중립 성과와는 관계없어요.</p>
+      </aside>
+    </section>
     <div class="notice-row">
       <div class="card notice-card" role="button" tabindex="0" onclick="openNotice()" onkeydown="if(event.key==='Enter'){openNotice()}">
         <span class="notice-tag n3">행사</span>
