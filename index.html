@@ -426,6 +426,75 @@ svg{display:block}
 }
 .u-title{display:flex;align-items:center;gap:12px}
 
+/* ---------- 홈: 대학 대항전 캠페인 (TOP5 순위와 공지사항 사이) ---------- */
+.campaign{
+  margin-top:34px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;
+  padding:26px 26px 24px;border-radius:20px;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-hover) 100%);box-shadow:var(--shadow-hover);
+}
+.campaign::after{
+  content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.16),transparent 70%);pointer-events:none;
+}
+.cp-main{display:flex;flex-direction:column;gap:12px;min-width:0;position:relative;z-index:1}
+.cp-tags{display:flex;gap:6px;flex-wrap:wrap}
+.cp-tag{font-size:11.5px;font-weight:900;letter-spacing:.06em;padding:3px 10px;border-radius:999px;background:#fff;color:var(--accent)}
+.cp-tag.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35)}
+.campaign h3{font-size:clamp(21px,2.6vw,27px);font-weight:900;line-height:1.3;letter-spacing:-.02em;color:#fff}
+.cp-sub{font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.88);font-weight:500;word-break:keep-all}
+.cp-sub b{color:#FDE68A}
+.cp-steps{list-style:none;margin:2px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cp-steps li{display:flex;gap:9px;align-items:flex-start;padding:11px 12px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);min-width:0}
+.cp-steps .n{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--accent);font-size:12px;font-weight:900}
+.cp-steps strong{display:block;font-size:13.5px;font-weight:800;word-break:keep-all}
+.cp-steps small{display:block;margin-top:2px;font-size:12px;color:rgba(255,255,255,.78);line-height:1.4;word-break:keep-all}
+.cp-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.cp-actions .btn-play{background:#fff;color:var(--accent);border:1px solid #fff}
+.cp-actions .btn-play:hover{background:var(--accent-soft)}
+.cp-actions .btn-apply{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55)}
+.cp-actions .btn-apply:hover{background:rgba(255,255,255,.12);border-color:#fff}
+.cp-actions .btn-apply[aria-disabled="true"]{opacity:.6;cursor:not-allowed}
+.cp-meta{display:flex;gap:6px;flex-wrap:wrap}
+.cp-meta span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22)}
+.cp-meta em{font-style:normal;font-weight:600;color:rgba(255,255,255,.7)}
+.cp-board{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 8px 24px rgba(11,19,32,.18);min-width:0}
+.cp-board-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cp-board-head h4{font-size:15.5px;font-weight:900;color:var(--ink-strong)}
+.cp-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--up)}
+.cp-live i{width:7px;height:7px;border-radius:50%;background:var(--up);animation:cpPulse 1.6s ease-in-out infinite}
+.cp-live[hidden]{display:none}
+@keyframes cpPulse{50%{opacity:.25}}
+.cp-board-sub{font-size:12px;color:var(--ink-faint);font-weight:600;margin-top:-4px}
+.cp-rank{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.cp-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px;background:var(--surface-2);font-size:13.5px;min-width:0}
+.cp-row .r{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:900;background:var(--surface);border:1px solid var(--line);color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.cp-row.top1 .r{background:#F5C542;border-color:#F5C542;color:#3B2A00}
+.cp-row.top2 .r{background:#CBD5E1;border-color:#CBD5E1;color:#1E293B}
+.cp-row.top3 .r{background:#E8B48A;border-color:#E8B48A;color:#3D1F08}
+.cp-row img{flex:none;width:24px;height:24px;border-radius:6px;object-fit:contain;background:#fff}
+.cp-row .nm{flex:1;min-width:0;font-weight:700;color:var(--ink-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp-row .pl{flex:none;font-size:11.5px;color:var(--ink-faint);font-weight:600}
+.cp-row .sc{flex:none;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
+.cp-empty{padding:18px 8px;text-align:center;font-size:13px;color:var(--ink-soft);line-height:1.6;background:var(--surface-2);border-radius:10px}
+.cp-more{align-self:center;font-size:12.5px;font-weight:800;color:var(--accent);padding:4px 8px;min-height:auto}
+.cp-more:hover{text-decoration:underline}
+.cp-note{font-size:11.5px;color:var(--ink-faint);line-height:1.5}
+@media(max-width:860px){.campaign{grid-template-columns:1fr}}
+@media(max-width:560px){
+  .campaign{padding:20px 16px;border-radius:16px;gap:16px}
+  .cp-steps{grid-template-columns:1fr}
+  .cp-actions .btn{flex:1 1 100%}
+}
+/* 게임 전체화면 오버레이 */
+.game-overlay{position:fixed;inset:0;z-index:3000;display:none;flex-direction:column;background:var(--bg)}
+.game-overlay.open{display:flex}
+.game-overlay-bar{
+  flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px;background:var(--surface);border-bottom:1px solid var(--line);
+}
+.game-overlay-bar b{font-size:14.5px;font-weight:900;color:var(--ink-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-overlay iframe{flex:1;width:100%;border:0;display:block;background:#d3eefb}
+
 /* ---------- 홈: 전국 요약 카드 ---------- */
 .natgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
 @media(max-width:760px){.natgrid{grid-template-columns:1fr}}
@@ -1125,6 +1194,41 @@ section.timeline{margin-top:36px}
       <div class="muted" style="padding:6px 6px 2px">전년 대비 감소율이 큰 순서입니다. 초록 계열은 '감축을 잘한 순위'를 뜻합니다.</div>
     </div>
   </div>
+
+  <!-- ============ 대학 대항전 캠페인 ============
+       ✏️ 수정할 곳: 기간·경품 문구(.cp-meta), 참여 신청 링크(id="campaignApply"의 href)
+       href 를 비워 두면 버튼이 '신청 링크 준비 중'으로 표시됩니다.
+       실시간 순위는 firebase-config.js 에 연결 정보를 넣으면 자동으로 나타납니다. -->
+  <section class="campaign" aria-labelledby="campaignTitle">
+    <div class="cp-main">
+      <div class="cp-tags"><span class="cp-tag">CAMPAIGN</span><span class="cp-tag ghost">미니게임 · 대학 대항전</span></div>
+      <h3 id="campaignTitle">🏆 우리 학교를 지켜라! 대학 대항전</h3>
+      <p class="cp-sub">게임 한 판으로 우리 학교를 응원하세요. 점수는 학교 순위에 바로 더해지고, 참여하신 분 중 추첨해 <b>기프티콘</b>을 드려요.</p>
+      <div class="cp-meta">
+        <span><em>기간</em>추후 공지</span>
+        <span><em>경품</em>추첨 기프티콘 🎁</span>
+      </div>
+      <ol class="cp-steps">
+        <li><span class="n">1</span><span><strong>게임 한 판</strong><small>좋은 건 받고, 나쁜 건 피하기!</small></span></li>
+        <li><span class="n">2</span><span><strong>점수 자동 반영</strong><small>우리 학교 순위에 바로 더해져요</small></span></li>
+        <li><span class="n">3</span><span><strong>참여 신청</strong><small>신청하면 기프티콘 추첨 응모 완료</small></span></li>
+      </ol>
+      <div class="cp-actions">
+        <button class="btn btn-play cp-play" type="button" onclick="openGame()" aria-haspopup="dialog">게임 시작 ▶</button>
+        <a class="btn btn-apply" id="campaignApply" href="" target="_blank" rel="noopener noreferrer">참여 신청하기 ↗</a>
+      </div>
+    </div>
+    <aside class="cp-board" aria-labelledby="cpBoardTitle">
+      <div class="cp-board-head">
+        <h4 id="cpBoardTitle">실시간 학교 순위</h4>
+        <span class="cp-live" id="cpLive" hidden><i></i>LIVE</span>
+      </div>
+      <p class="cp-board-sub">게임 점수 합산 기준</p>
+      <ol class="cp-rank" id="cpRank" aria-live="polite"><li class="cp-empty">순위를 불러오는 중…</li></ol>
+      <button class="cp-more" id="cpMore" type="button" hidden onclick="toggleCampaignRank()">전체 학교 보기</button>
+      <p class="cp-note">※ 게임 점수로 매긴 순위예요. 실제 탄소중립 성과와는 관계없어요.</p>
+    </aside>
+  </section>
 
   <section class="notice-sec">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -5018,6 +5122,92 @@ function init() {
   hydrateFromHash();      /* [A-3] 루트(#없음) 진입은 홈, 딥링크는 해당 화면, 그 외에는 404 */
 }
 init();
+</script>
+<script src="firebase-config.js"></script>
+<script src="kuce-scores.js"></script>
+<!-- 미니게임 전체화면 오버레이 -->
+<div class="game-overlay" id="gameOverlay" role="dialog" aria-modal="true" aria-label="미니게임: 우리 학교를 지켜라!">
+  <div class="game-overlay-bar">
+    <button class="btn btn-ghost btn-sm" type="button" onclick="closeGame()">← 사이트로 돌아가기</button>
+    <b>우리 학교를 지켜라!</b>
+    <span style="width:38px" aria-hidden="true"></span>
+  </div>
+  <iframe id="gameFrame" title="미니게임: 우리 학교를 지켜라!" allow="fullscreen; autoplay"></iframe>
+</div>
+<script>
+/* 미니게임 열기/닫기 — 처음 열 때만 game.html 을 불러옵니다(약 1MB) */
+function openGame() {
+  const ov = document.getElementById('gameOverlay');
+  const fr = document.getElementById('gameFrame');
+  fr.onload = () => { try { fr.contentWindow.addEventListener('keydown', e => { if (e.key === 'Escape') closeGame(); }); } catch (e) {} };
+  if (!fr.getAttribute('src')) fr.setAttribute('src', 'game.html');
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { try { fr.focus(); } catch (e) {} }, 50);
+}
+function closeGame() {
+  document.getElementById('gameOverlay').classList.remove('open');
+  if (!document.querySelector('.modal.open')) document.body.style.overflow = '';
+  const b = document.querySelector('.cp-play'); if (b) b.focus();
+  if (typeof loadCampaignRank === 'function') loadCampaignRank();
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('gameOverlay').classList.contains('open')) closeGame();
+});
+/* 대학 대항전 실시간 순위판 (kuce-scores.js 사용) */
+let cpRankAll = false, cpRankList = null;
+function renderCampaignRank() {
+  const ol = document.getElementById('cpRank'), more = document.getElementById('cpMore');
+  if (!ol) return;
+  if (!cpRankList) return;
+  const played = cpRankList.filter(r => r.plays > 0);
+  if (!played.length) {
+    ol.innerHTML = '<li class="cp-empty">아직 기록이 없어요.<br>첫 점수의 주인공이 되어 보세요!</li>';
+    more.hidden = true; return;
+  }
+  const rows = cpRankAll ? played : played.slice(0, 5);
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  ol.innerHTML = rows.map(r =>
+    '<li class="cp-row' + (r.rank <= 3 && r.plays ? ' top' + r.rank : '') + '">' +
+      '<span class="r">' + r.rank + '</span>' +
+      '<img src="assets/logos/' + esc(r.logo) + '" alt="" width="24" height="24" loading="lazy">' +
+      '<span class="nm">' + esc(r.name) + '</span>' +
+      '<span class="pl">' + r.plays.toLocaleString('ko-KR') + '판</span>' +
+      '<b class="sc">' + r.total.toLocaleString('ko-KR') + '</b>' +
+    '</li>').join('');
+  more.hidden = played.length <= 5;
+  more.textContent = cpRankAll ? '접기' : '참여한 ' + played.length + '개 학교 모두 보기';
+}
+function toggleCampaignRank() { cpRankAll = !cpRankAll; renderCampaignRank(); }
+async function loadCampaignRank() {
+  const ol = document.getElementById('cpRank'), live = document.getElementById('cpLive');
+  if (!ol || !window.KUCE_SCORES) return;
+  if (!KUCE_SCORES.configured()) {
+    ol.innerHTML = '<li class="cp-empty">실시간 순위판을 준비하고 있어요.<br>곧 열려요!</li>';
+    return;
+  }
+  try {
+    cpRankList = await KUCE_SCORES.fetchSchoolTotals();
+    live.hidden = false;
+    renderCampaignRank();
+  } catch (e) {
+    console.warn('[KUCE] 순위 불러오기 실패', e);
+    live.hidden = true;
+    if (!cpRankList) ol.innerHTML = '<li class="cp-empty">순위를 불러오지 못했어요.<br>잠시 후 다시 시도해 주세요.</li>';
+  }
+}
+loadCampaignRank();
+setInterval(() => { if (!document.hidden) loadCampaignRank(); }, 20000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadCampaignRank(); });
+
+/* 캠페인 참여 신청 링크가 비어 있으면 '준비 중'으로 표시 */
+(function () {
+  const a = document.getElementById('campaignApply');
+  if (!a || a.getAttribute('href')) return;
+  a.textContent = '신청 링크 준비 중';
+  a.setAttribute('aria-disabled', 'true');
+  a.removeAttribute('href');
+})();
 </script>
 </body>
 </html>
