@@ -269,7 +269,22 @@ svg{display:block}
   display:inline-block;margin-left:4px;padding:3px 11px;border-radius:999px;
   background:var(--accent-soft);color:var(--accent);font-weight:900;font-size:12.5px;
 }
-/* ---------- '미제공!' 낙인 · 데이터 확인 표시 ---------- */
+/* ---------- 학교비교: 데이터 출처 박스 ---------- */
+.src-box{margin:0 0 18px;padding:16px 18px;border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:12px;background:var(--accent-soft)}
+.src-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.src-head h2{font-size:15.5px;font-weight:900;color:var(--ink-strong)}
+.src-meta{font-size:12px;font-weight:700;color:var(--ink-soft)}
+.src-lead{margin-top:6px;font-size:13px;line-height:1.6;color:var(--ink-soft);word-break:keep-all}
+.src-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 18px;margin:12px 0 0}
+.src-grid div{min-width:0}
+.src-grid dt{font-size:11.5px;font-weight:800;color:var(--accent);letter-spacing:.02em}
+.src-grid dd{margin:2px 0 0;font-size:13px;line-height:1.55;color:var(--ink);word-break:keep-all}
+.src-grid a,.src-foot a{color:var(--ink-strong);font-weight:800;text-decoration:underline;text-underline-offset:2px}
+.src-grid small{color:var(--ink-faint);font-weight:600}
+.src-foot{margin-top:10px;font-size:12px;color:var(--ink-soft)}
+@media(max-width:560px){.src-box{padding:14px}}
+
+/* ---------- 데이터 확인 표시 ---------- */
 .stamp{
   display:inline-flex;align-items:center;gap:4px;padding:2px 8px 1px;margin-left:6px;
   border:2px solid #B91C1C;border-radius:4px;outline:1px solid #B91C1C;outline-offset:2px;
@@ -1641,6 +1656,23 @@ section.timeline{margin-top:36px}
 <main class="page" id="page-compare">
   <div class="crumb"><button type="button" onclick="go('home')">홈</button> › 학교 비교 데이터</div>
 
+  <!-- 데이터 출처 (신뢰도 확보용 — 학교비교 화면 맨 위에 항상 표시) -->
+  <section class="src-box" aria-labelledby="srcBoxTitle">
+    <div class="src-head">
+      <h2 id="srcBoxTitle">📑 데이터 출처</h2>
+      <span class="src-meta" id="srcMeta"></span>
+    </div>
+    <p class="src-lead">이 화면의 모든 수치는 정부·공공기관이 공개한 자료를 그대로 옮긴 것입니다. 학교마다 쓴 출처는 상세 페이지 <b>기타정보</b>에서 확인할 수 있습니다.</p>
+    <dl class="src-grid">
+      <div><dt>탄소배출량</dt><dd id="srcCarbon"></dd></div>
+      <div><dt>에너지사용량</dt><dd><a href="https://www.gir.go.kr" target="_blank" rel="noopener noreferrer">온실가스종합정보센터(GIR)</a> 명세서 배출량 통계</dd></div>
+      <div><dt>인구수 (1인당 지표)</dt><dd><a href="https://kess.kedi.re.kr" target="_blank" rel="noopener noreferrer">교육통계서비스</a> 학교별 데이터셋 (2024)</dd></div>
+      <div><dt>교지면적 (면적당 지표)</dt><dd><a href="https://www.academyinfo.go.kr" target="_blank" rel="noopener noreferrer">대학알리미</a> 교지 확보 현황 (2024)</dd></div>
+      <div><dt>사전할당량</dt><dd><a href="https://ets.krx.co.kr" target="_blank" rel="noopener noreferrer">배출권시장 정보플랫폼</a> (2024, 배출권거래제 대상만)</dd></div>
+    </dl>
+    <p class="src-foot">데이터 오류를 발견하셨나요? <a href="mailto:net0campus.kr@gmail.com">net0campus.kr@gmail.com</a>으로 알려 주시면 확인 후 바로 고칩니다.</p>
+  </section>
+
   <div class="tabs" role="tablist" aria-label="데이터 종류">
     <button type="button" id="tab-carbon" role="tab" onclick="setTab('carbon')">탄소배출량</button>
     <button type="button" id="tab-energy" role="tab" onclick="setTab('energy')">에너지사용량</button>
@@ -2645,8 +2677,8 @@ const CONFIG = {
   /* 학교별 출처가 비어 있을 때 표시할 문구 */
   SOURCE_UNCONFIRMED: '출처 확인 중',
   /* 탄소배출량이 공개 자료에서 확인되지 않은 연도 표시 */
-  MISSING_LABEL: '미제공!',
-  MISSING_DESC: '공개 자료(온실가스종합정보센터 명세서 등)에서 해당 연도 탄소배출량이 확인되지 않았습니다.',
+  MISSING_LABEL: '정보 제공 X',
+  MISSING_DESC: '공개 자료에서 해당 연도 탄소배출량이 확인되지 않았습니다.',
   /* 자료 기준이 달라 데이터팀이 일부러 뺀 연도 표시(낙인 아님) */
   EXCLUDED_LABEL: '제외',
   MAX_COMPARE: 6
@@ -2744,7 +2776,9 @@ const UNIVERSITIES = [
   { id:'yonsei', name:'연세대학교', legal:'학교법인 연세대학교', region:'수도권', scheme:'ETS',
     campuses:['신촌캠퍼스','국제캠퍼스'], members:52838, gfa:1595587, baseline:164941, credit:null, source:GHG, energySource:GHG,
     carbon:[178114, 193941, 201772, 203451], energy:[3674, 4017, 4174, 4207],
-    notes:['본교(신촌캠퍼스+국제캠퍼스) 기준으로 산정했습니다. 인구수에서 분교(미래캠퍼스)는 제외했습니다.'], status:'active' },
+    notes:['본교(신촌캠퍼스+국제캠퍼스) 기준으로 산정했습니다. 인구수에서 분교(미래캠퍼스)는 제외했습니다.',
+           '명세서는 법인(학교법인 연세대학교) 단위로 집계되어, 같은 법인이 운영하는 세브란스병원 등 대학 외 시설이 포함되었을 가능성이 있어 확인 중입니다.'],
+    status:'active' },
   { id:'yu', name:'영남대학교', legal:'학교법인 영남학원', region:'영남권', scheme:'TMS',
     campuses:['전 캠퍼스 합산'], members:27428, gfa:2689463, baseline:null, credit:null, source:ENV, energySource:GHG,
     carbon:[14768, 15810, 15484, 16321], energy:[null, 326, 633, 645],
@@ -2863,14 +2897,9 @@ function missingYears(u) {
   return u && u.carbon ? YEARS.filter((_, i) => u.carbon[i] == null && !isExcluded(u, i)) : [];
 }
 function excludedYears(u) { return u && u.excluded ? YEARS.filter((_, i) => isExcluded(u, i)) : []; }
-function stampHTML(u, size) {
-  const yrs = missingYears(u);
-  if (!yrs.length) return '';
-  const tip = yrs.join('·') + '년 탄소배출량 미제공 — ' + CONFIG.MISSING_DESC;
-  return '<span class="stamp' + (size ? ' ' + size : '') + '" title="' + attr(tip) + '" data-tip="' +
-    attr(tipBody(u.name + ' · 탄소배출량 ' + CONFIG.MISSING_LABEL, [['미제공 연도', yrs.join(', ') + '년']]) +
-      '<div class="tip-src">' + esc(CONFIG.MISSING_DESC) + '</div>') + '">' + esc(CONFIG.MISSING_LABEL) + '</span>';
-}
+/* 과거 연도 결측은 낙인처럼 보이지 않도록 목록·배지에는 표시하지 않습니다.
+   (상세 페이지 그래프의 해당 연도에만 작은 ✕ 표시 — drawLine 참고) */
+function stampHTML() { return ''; }
 function srcFlagHTML(u, tab) {
   if (!u || (tab === 'energy' ? u.energySource : tab === 'carbon' ? u.source : (u.source && u.energySource))) return '';
   return '<span class="flag-chip" title="원자료에 출처가 기재되지 않아 확인 중입니다">' + esc(CONFIG.SOURCE_UNCONFIRMED) + '</span>';
@@ -3586,6 +3615,7 @@ function renderCompare() {
     esc(CONFIG.SOURCE.alimi) + ' (' + CONFIG.SOURCE.alimiYear + ')' +
     (CONFIG.IS_SAMPLE_DATA ? ' · <b>현재 수치는 구조 검증용 샘플입니다.</b>' : '');
 
+  renderSourceBox();
   const rows = filteredRows();
   document.getElementById('resultCount').innerHTML =
     '전체 ' + ACTIVE.length + '개 중 <b>' + rows.length + '개</b> 표시 중' +
@@ -3595,6 +3625,22 @@ function renderCompare() {
   renderSelection();
   renderPendingBox();
   document.getElementById('dlSelected').disabled = state.selected.length === 0;
+}
+
+/* 학교비교 상단 출처 박스 — 탄소배출량 출처별 학교 수는 데이터에서 자동 계산 */
+const SOURCE_LINKS = {
+  [GHG]: 'https://www.gir.go.kr',
+  [ENV]: 'https://www.env-info.kr',
+  [NGMS]: 'https://ngms.gir.go.kr'
+};
+function renderSourceBox() {
+  const cnt = {};
+  ACTIVE.forEach(u => { const k = srcOf(u, 'carbon'); cnt[k] = (cnt[k] || 0) + 1; });
+  document.getElementById('srcCarbon').innerHTML = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).map(k =>
+    (SOURCE_LINKS[k] ? '<a href="' + SOURCE_LINKS[k] + '" target="_blank" rel="noopener noreferrer">' + esc(k) + '</a>' : esc(k)) +
+    ' <small>' + cnt[k] + '개교</small>').join(' · ');
+  document.getElementById('srcMeta').textContent =
+    '수록 기간 ' + YEARS[0] + '–' + YEARS[LAST] + '년 · ' + ACTIVE.length + '개교 · 최근 업데이트 ' + CONFIG.UPDATED;
 }
 
 function toggleRegion(r) {
@@ -3963,8 +4009,8 @@ function renderInfo(u) {
   const missing = missingYears(u);
   document.getElementById('dInfoArea').innerHTML = items.map(([l, v]) =>
     '<div class="card inforow"><span class="il">' + esc(l) + '</span><span class="iv">' + esc(v) + '</span></div>').join('') +
-    (missing.length ? '<div class="card inforow"><span class="il">탄소배출량 미제공 연도</span><span class="iv">' +
-      esc(missing.join(', ') + '년') + stampHTML(u) + '</span></div>' : '') +
+    (missing.length ? '<div class="card inforow"><span class="il">탄소배출량 정보 제공 X 연도</span><span class="iv">' +
+      esc(missing.join(', ') + '년') + '</span></div>' : '') +
     (excludedYears(u).length ? '<div class="card inforow"><span class="il">제외 연도 (탄소·에너지)</span><span class="iv">' +
       esc(excludedYears(u).join(', ') + '년') + '</span></div>' : '') +
     notesHTML(u, 'grid-column:1/-1') +
@@ -4010,15 +4056,12 @@ function drawLine(container, u, tab) {
         (excl ? '<div class="tip-src">' + esc(u.excluded[YEARS[i]]) + '</div>'
           : tab === 'carbon' ? '<div class="tip-src">' + esc(CONFIG.MISSING_DESC) + '</div>' : '');
       const cy = (P.t + H - P.b) / 2;
-      const sx = Math.min(Math.max(x(i), P.l + 52), W - P.r - 52);
-      stamps += tab === 'carbon' && !excl
-        ? '<g transform="rotate(-8 ' + sx + ' ' + cy + ')" tabindex="0" data-tip="' + attr(tip) + '" style="cursor:help">' +
-          '<rect x="' + (sx - 46) + '" y="' + (cy - 17) + '" width="92" height="34" rx="4" fill="#FFF5F5" stroke="#B91C1C" stroke-width="2.5"/>' +
-          '<rect x="' + (sx - 41) + '" y="' + (cy - 12) + '" width="82" height="24" rx="2" fill="none" stroke="#B91C1C" stroke-width="1"/>' +
-          '<text x="' + sx + '" y="' + (cy + 6) + '" text-anchor="middle" font-size="16" font-weight="900" letter-spacing="1.5" fill="#B91C1C">' + esc(missLabel) + '</text></g>'
-        : '<g tabindex="0" data-tip="' + attr(tip) + '" style="cursor:help">' +
-          (excl ? '<rect x="' + (sx - 30) + '" y="' + (cy - 13) + '" width="60" height="26" rx="13" fill="#F3F6F9" stroke="#CBD5E1"/>' : '') +
-          '<text x="' + sx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="' + (excl ? 800 : 400) + '" fill="#8A95A3">' + esc(missLabel) + '</text></g>';
+      const sx = Math.min(Math.max(x(i), P.l + 30), W - P.r - 30);
+      const gy = (P.t + H - P.b) / 2;
+      stamps += '<g tabindex="0" data-tip="' + attr(tip) + '" style="cursor:help">' +
+        '<line x1="' + (sx - 7) + '" y1="' + (gy - 7) + '" x2="' + (sx + 7) + '" y2="' + (gy + 7) + '" stroke="#94A3B8" stroke-width="2.4" stroke-linecap="round"/>' +
+        '<line x1="' + (sx + 7) + '" y1="' + (gy - 7) + '" x2="' + (sx - 7) + '" y2="' + (gy + 7) + '" stroke="#94A3B8" stroke-width="2.4" stroke-linecap="round"/>' +
+        '<text x="' + sx + '" y="' + (gy + 24) + '" text-anchor="middle" font-size="10.5" fill="#94A3B8">' + esc(missLabel) + '</text></g>';
       return;
     }
     let pi = i - 1; while (pi >= 0 && arr[pi] == null) pi--;
@@ -4036,9 +4079,7 @@ function drawLine(container, u, tab) {
     (tab === 'carbon' && u.carbonNote ? ' <span class="muted" style="font-weight:600">· ' + esc(u.carbonNote) + '</span>' : '') +
     (tab === 'energy' && u.energyFlag ? '<span class="flag-chip" title="' + attr(u.energyFlag) + '">확인 필요</span>' : '') + '</b>' +
     '<span class="muted">' + YEARS[LAST] + '년: <b style="color:var(--accent)">' + fmt(arr[LAST]) + ' ' + unit + '</b></span></div>' +
-    (tab === 'carbon' && missingYears(u).length
-      ? '<div class="stamp-banner">' + stampHTML(u, 'lg') + '<span><b>' + esc(missingYears(u).join('·')) + '년 탄소배출량</b>이 공개 자료에서 확인되지 않았습니다.<br>' +
-        '<span style="opacity:.85">자료가 확인되면 바로 반영합니다. 오류 제보: net0campus.kr@gmail.com</span></span></div>' : '') +
+
     '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + attr(label + ' 연도별 추이') + '">' +
     grid + labels +
     (area ? '<polygon points="' + area + '" fill="rgba(29,78,216,.09)"/>' : '') +
@@ -4054,8 +4095,8 @@ function drawLine(container, u, tab) {
 /* 분캠 탄소배출량 — 순위에는 넣지 않고 따로 보여 줍니다 */
 function branchHTML(u) {
   if (!u.branches || !u.branches.length) return '';
-  const cell = (v, i) => v != null ? fmt(v) : isExcluded(u, i) ? '<span class="muted">' + CONFIG.EXCLUDED_LABEL + '</span>'
-    : '<span class="stamp" style="margin:0">' + esc(CONFIG.MISSING_LABEL) + '</span>';
+  const cell = (v, i) => v != null ? fmt(v) : isExcluded(u, i) ? '<span class="muted">✕ <small>' + CONFIG.EXCLUDED_LABEL + '</small></span>'
+    : '<span class="muted" title="' + attr(CONFIG.MISSING_DESC) + '">✕ <small>' + esc(CONFIG.MISSING_LABEL) + '</small></span>';
   return '<div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">' +
     '<b style="font-size:14px">분캠 탄소배출량 <span class="muted">(tCO₂e · 순위 미반영)</span></b>' +
     '<div style="overflow-x:auto"><table class="branch-table"><thead><tr><th>구분</th>' +
@@ -5117,7 +5158,7 @@ function bindEvents() {
     : '※ 데이터 출처: ' + esc(CONFIG.SOURCE.ghg) + ' (' + CONFIG.SOURCE.ghgYear + '), ' +
       esc(CONFIG.SOURCE.alimi) + ' (' + CONFIG.SOURCE.alimiYear + '). 1인당 지표의 분모는 ' + CONFIG.SOURCE.alimiYear +
       '년 인구수(교육통계서비스), 면적당 지표의 분모는 교지면적(대학알리미)입니다. 캠퍼스별 배출량이 나뉜 학교는 본교만 순위에 반영하고 분캠은 상세 페이지에 따로 표시합니다. ' +
-      '<b style="color:#B91C1C">' + esc(CONFIG.MISSING_LABEL) + '</b> 표시는 ' + esc(CONFIG.MISSING_DESC);
+      '그래프의 ✕(' + esc(CONFIG.MISSING_LABEL) + ') 표시는 ' + esc(CONFIG.MISSING_DESC);
 }
 
 function init() {
